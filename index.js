@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 // import easing from './easing.js';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useAvatarInternal, useActivate, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useAvatarInternal, useNpcPlayerInternal, useActivate, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -19,6 +19,7 @@ export default () => {
   const app = useApp();
   const scene = useScene();
   const Avatar = useAvatarInternal();
+  const NpcPlayer = useNpcPlayerInternal();
   // const physics = usePhysics();
 
   async function createAvatar(app) {
@@ -48,7 +49,7 @@ export default () => {
 
   const subApps = [];
   // let physicsIds = [];
-  let avatar = null;
+  let npcPlayer = null;
   (async () => {
     // const u2 = `${baseUrl}tsumugi-taka.vrm`;
     const u2 = `${baseUrl}rabbit.vrm`;
@@ -70,7 +71,9 @@ export default () => {
     scene.add(vrmApp);
     subApps.push(vrmApp);
 
-    avatar = await createAvatar(vrmApp);
+    const newNpcPlayer = new NpcPlayer();
+    await newNpcPlayer.setAvatarAppAsync(vrmApp);
+    npcPlayer = newNpcPlayer;
   })();
 
   app.getPhysicsObjects = () => {
@@ -83,7 +86,14 @@ export default () => {
   // window.getPhysicsObjects = app.getPhysicsObjects;
 
   useFrame(({timestamp, timeDiff}) => {
-    if (avatar) {
+    if (npcPlayer) {
+      // console.log('update npc player');
+      const f = timestamp / 5000;
+      const s = Math.sin(f);
+      npcPlayer.position.set(s * 2, npcPlayer.avatar.height, 0);
+      npcPlayer.updateAvatar(timestamp, timeDiff);
+    }
+    /* if (avatar) {
       const f = timestamp / 5000;
       const s = Math.sin(f);
       avatar.inputs.hmd.position.set(s * 2, avatar.height, 0);
@@ -94,7 +104,7 @@ export default () => {
       }
       // const timeDiffS = timeDiff / 1000;
       avatar.update(timeDiff);
-    }
+    } */
   });
   
   /* app.addEventListener('transformupdate', () => {
