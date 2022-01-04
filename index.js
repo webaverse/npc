@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 // import easing from './easing.js';
 import metaversefile from 'metaversefile';
+import { Vector3 } from 'three';
 const {useApp, useFrame, useAvatarInternal, useNpcPlayerInternal, useActivate, useLoaders, useScene, usePhysics, useCleanup, useLocalPlayer} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
@@ -96,6 +97,9 @@ export default () => {
       const s = Math.sin(f);
       npcPlayer.position.set(s * 2, npcPlayer.avatar.height, 0);
       npcPlayer.updateAvatar(timestamp, timeDiff);
+
+      const distance = npcPlayer.distanceTo(player);
+      console.log(distance);
     }
     /* if (avatar) {
       const f = timestamp / 5000;
