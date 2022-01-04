@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 // import easing from './easing.js';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useAvatarInternal, useNpcPlayerInternal, useActivate, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useAvatarInternal, useNpcPlayerInternal, useActivate, useLoaders, useScene, usePhysics, useCleanup, useLocalPlayer} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -22,6 +22,10 @@ export default () => {
   const NpcPlayer = useNpcPlayerInternal();
   // const physics = usePhysics();
 
+  const player = useLocalPlayer();
+  
+  console.log(player);
+  console.log(useScene);
   async function createAvatar(app) {
     await app.setSkinning(true);
     const {skinnedVrm} = app;
