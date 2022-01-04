@@ -21,6 +21,7 @@ export default () => {
   const scene = useScene();
   const Avatar = useAvatarInternal();
   const NpcPlayer = useNpcPlayerInternal();
+  const attacking = false;
   // const physics = usePhysics();
 
   const player = useLocalPlayer();
@@ -99,7 +100,18 @@ export default () => {
       npcPlayer.updateAvatar(timestamp, timeDiff);
 
       const distance = npcPlayer.position.distanceTo(player.position);
-      console.log(distance);
+
+      if(distance < 0.5) {
+
+        if (!attacking) {
+          attacking = true;
+          player.healthControl.takeDamage(50);
+          setTimeout(() => {
+          attacking = false;
+          }, 2000);
+        }
+
+      }
     }
     /* if (avatar) {
       const f = timestamp / 5000;
