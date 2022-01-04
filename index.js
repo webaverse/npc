@@ -21,7 +21,7 @@ export default () => {
   const scene = useScene();
   const Avatar = useAvatarInternal();
   const NpcPlayer = useNpcPlayerInternal();
-  const attacking = false;
+  let attacking = false;
   // const physics = usePhysics();
 
   const player = useLocalPlayer();
