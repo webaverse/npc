@@ -98,7 +98,7 @@ export default () => {
       npcPlayer.position.set(s * 2, npcPlayer.avatar.height, 0);
       npcPlayer.updateAvatar(timestamp, timeDiff);
 
-      const distance = npcPlayer.position.distanceTo(player);
+      const distance = npcPlayer.position.distanceTo(player.position);
       console.log(distance);
     }
     /* if (avatar) {
