@@ -92,6 +92,7 @@ export default () => {
       const s = Math.sin(f);
       npcPlayer.position.set(s * 2, npcPlayer.avatar.height, 0);
       npcPlayer.updateAvatar(timestamp, timeDiff);
+      console.log(metaversefile);
     }
     /* if (avatar) {
       const f = timestamp / 5000;
