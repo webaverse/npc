@@ -25,9 +25,6 @@ export default () => {
   // const physics = usePhysics();
 
   const player = useLocalPlayer();
-  
-  console.log(player);
-  console.log(scene);
   async function createAvatar(app) {
     await app.setSkinning(true);
     const {skinnedVrm} = app;
