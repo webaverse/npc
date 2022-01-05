@@ -98,14 +98,11 @@ export default () => {
       const s = Math.sin(f);
       npcPlayer.position.set(s * 2, npcPlayer.avatar.height, 0);
       npcPlayer.updateAvatar(timestamp, timeDiff);
-
       const distance = npcPlayer.position.distanceTo(player.position);
-
       if(distance < 0.5) {
-
         if (!attacking) {
           attacking = true;
-          player.healthControl.takeDamage(50);
+          player.healthControl.takeDamage(10);
           setTimeout(() => {
           attacking = false;
           }, 2000);
