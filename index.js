@@ -1,8 +1,7 @@
 import * as THREE from 'three';
 // import easing from './easing.js';
 import metaversefile from 'metaversefile';
-import { Vector3 } from 'three';
-const {useApp, useFrame, useAvatarInternal, useNpcPlayerInternal, useActivate, useLoaders, useScene, usePhysics, useCleanup, useLocalPlayer} = metaversefile;
+const {useApp, useFrame, useAvatarInternal, useNpcPlayerInternal, useActivate, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -21,10 +20,8 @@ export default () => {
   const scene = useScene();
   const Avatar = useAvatarInternal();
   const NpcPlayer = useNpcPlayerInternal();
-  let attacking = false;
   // const physics = usePhysics();
 
-  const player = useLocalPlayer();
   async function createAvatar(app) {
     await app.setSkinning(true);
     const {skinnedVrm} = app;
@@ -95,17 +92,6 @@ export default () => {
       const s = Math.sin(f);
       npcPlayer.position.set(s * 2, npcPlayer.avatar.height, 0);
       npcPlayer.updateAvatar(timestamp, timeDiff);
-      const distance = npcPlayer.position.distanceTo(player.position);
-      if(distance < 0.5) {
-        if (!attacking) {
-          attacking = true;
-          player.healthControl.takeDamage(10);
-          setTimeout(() => {
-          attacking = false;
-          }, 2000);
-        }
-
-      }
     }
     /* if (avatar) {
       const f = timestamp / 5000;
