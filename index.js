@@ -103,7 +103,7 @@ export default () => {
         avatar.setHandEnabled(i, false);
       }
       // const timeDiffS = timeDiff / 1000;
-      avatar.update(timeDiff);
+      avatar.update(timestamp, timeDiff);
     } */
   });
   
