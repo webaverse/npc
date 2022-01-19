@@ -18,25 +18,8 @@ const unFrustumCull = o => {
 export default () => {
   const app = useApp();
   const scene = useScene();
-  const Avatar = useAvatarInternal();
   const NpcPlayer = useNpcPlayerInternal();
   // const physics = usePhysics();
-
-  async function createAvatar(app) {
-    await app.setSkinning(true);
-    const {skinnedVrm} = app;
-    const avatar = new Avatar(skinnedVrm, {
-      fingers: true,
-      hair: true,
-      visemes: true,
-      debug: false,
-    });
-    // avatar[appSymbol] = app;
-  
-    unFrustumCull(app);
-  
-    return avatar;
-  }
   
   /* let activateCb = null;
   let frameCb = null;
