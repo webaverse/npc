@@ -15,7 +15,7 @@ const unFrustumCull = o => {
   });
 };
 
-export default () => {
+export default e => {
   const app = useApp();
   const scene = useScene();
   const NpcPlayer = useNpcPlayerInternal();
@@ -33,7 +33,7 @@ export default () => {
   const subApps = [];
   // let physicsIds = [];
   let npcPlayer = null;
-  (async () => {
+  e.waitUntil((async () => {
     // const u2 = `${baseUrl}tsumugi-taka.vrm`;
     const u2 = `${baseUrl}rabbit.vrm`;
     const m = await metaversefile.import(u2);
@@ -57,7 +57,7 @@ export default () => {
     const newNpcPlayer = new NpcPlayer();
     await newNpcPlayer.setAvatarAppAsync(vrmApp);
     npcPlayer = newNpcPlayer;
-  })();
+  })());
 
   app.getPhysicsObjects = () => {
     const result = [];
