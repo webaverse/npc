@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-// import easing from './easing.js';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useAvatarInternal, useLocalPlayer, useNpcPlayerInternal, useActivate, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useActivate, useLocalPlayer, useNpcPlayerInternal, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -9,7 +8,7 @@ const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
-const localMatrix = new THREE.Matrix4();
+// const localMatrix = new THREE.Matrix4();
 
 /* const unFrustumCull = o => {
   o.traverse(o => {
@@ -27,15 +26,6 @@ export default e => {
   const NpcPlayer = useNpcPlayerInternal();
   const localPlayer = useLocalPlayer();
   // const physics = usePhysics();
-  
-  /* let activateCb = null;
-  let frameCb = null;
-  useActivate(() => {
-    activateCb && activateCb();
-  });
-  useFrame(() => {
-    frameCb && frameCb();
-  }); */
 
   const subApps = [];
   // let physicsIds = [];
@@ -50,9 +40,6 @@ export default e => {
       name: u2,
     });
 
-    // vrmApp.contentId = u2;
-    // vrmApp.instanceId = getNextInstanceId();
-    // console.log('set app position', app.position.toArray().join(','));
     vrmApp.position.copy(app.position);
     vrmApp.quaternion.copy(app.quaternion);
     vrmApp.scale.copy(app.scale);
@@ -75,11 +62,9 @@ export default e => {
     }
     return result;
   };
-  // window.getPhysicsObjects = app.getPhysicsObjects;
 
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer) {
-      // console.log('update npc player');
       const f = timestamp / 5000;
       const s = Math.sin(f);
       npcPlayer.matrix.compose(
@@ -88,34 +73,15 @@ export default e => {
         localVector3.set(1, 1, 1),
       ).premultiply(app.matrixWorld).decompose(npcPlayer.position, npcPlayer.quaternion, localVector3);
       npcPlayer.updateMatrixWorld();
-      /* npcPlayer.position.add(
-        localVector.set(s * 2, npcPlayer.avatar.height, 0)
-          .applyQuaternion(npcPlayer.avatar.quaternion)
-      ); */
       npcPlayer.eyeballTarget.copy(localPlayer.position);
       npcPlayer.eyeballTargetEnabled = true;
       npcPlayer.updateAvatar(timestamp, timeDiff);
     }
-    /* if (avatar) {
-      const f = timestamp / 5000;
-      const s = Math.sin(f);
-      avatar.inputs.hmd.position.set(s * 2, avatar.height, 0);
-      avatar.setTopEnabled(false);
-      avatar.setBottomEnabled(false);
-      for (let i = 0; i < 2; i++) {
-        avatar.setHandEnabled(i, false);
-      }
-      // const timeDiffS = timeDiff / 1000;
-      avatar.update(timestamp, timeDiff);
-    } */
   });
-  
-  /* app.addEventListener('transformupdate', () => {
-    for (const physicsObject of physicsIds) {
-      _getPhysicsTransform(physicsObject.position, physicsObject.quaternion);
-      physics.setTransform(physicsObject);
-    }
-  }); */
+
+  useActivate(() => {
+    console.log('activate');
+  });
 
   /* useCleanup(() => {
     for (const physicsId of physicsIds) {
