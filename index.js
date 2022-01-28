@@ -1,11 +1,17 @@
 import * as THREE from 'three';
 // import easing from './easing.js';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useAvatarInternal, useNpcPlayerInternal, useActivate, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useAvatarInternal, useLocalPlayer, useNpcPlayerInternal, useActivate, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
-const unFrustumCull = o => {
+const localVector = new THREE.Vector3();
+const localVector2 = new THREE.Vector3();
+const localVector3 = new THREE.Vector3();
+const localQuaternion = new THREE.Quaternion();
+const localMatrix = new THREE.Matrix4();
+
+/* const unFrustumCull = o => {
   o.traverse(o => {
     if (o.isMesh) {
       o.frustumCulled = false;
@@ -13,12 +19,13 @@ const unFrustumCull = o => {
       // o.receiveShadow = true;
     }
   });
-};
+}; */
 
 export default e => {
   const app = useApp();
   const scene = useScene();
   const NpcPlayer = useNpcPlayerInternal();
+  const localPlayer = useLocalPlayer();
   // const physics = usePhysics();
   
   /* let activateCb = null;
@@ -35,7 +42,9 @@ export default e => {
   let npcPlayer = null;
   e.waitUntil((async () => {
     // const u2 = `${baseUrl}tsumugi-taka.vrm`;
-    const u2 = `${baseUrl}rabbit.vrm`;
+    // const u2 = `${baseUrl}rabbit.vrm`;
+    // const u2 = `/avatars/drake_hacker_v3_vian.vrm`;
+    const u2 = `/avatars/Scillia_Drophunter_V19.vrm`;
     const m = await metaversefile.import(u2);
     const vrmApp = metaversefile.createApp({
       name: u2,
@@ -48,7 +57,7 @@ export default e => {
     vrmApp.quaternion.copy(app.quaternion);
     vrmApp.scale.copy(app.scale);
     vrmApp.updateMatrixWorld();
-    // vrmApp.name = 'npcVrm';
+    vrmApp.name = 'npc';
     vrmApp.setComponent('physics', true);
     await vrmApp.addModule(m);
     scene.add(vrmApp);
@@ -73,7 +82,18 @@ export default e => {
       // console.log('update npc player');
       const f = timestamp / 5000;
       const s = Math.sin(f);
-      npcPlayer.position.set(s * 2, npcPlayer.avatar.height, 0);
+      npcPlayer.matrix.compose(
+        localVector.set(s * 2, npcPlayer.avatar.height, 0),
+        localQuaternion.setFromAxisAngle(localVector2.set(0, 1, 0), 0),
+        localVector3.set(1, 1, 1),
+      ).premultiply(app.matrixWorld).decompose(npcPlayer.position, npcPlayer.quaternion, localVector3);
+      npcPlayer.updateMatrixWorld();
+      /* npcPlayer.position.add(
+        localVector.set(s * 2, npcPlayer.avatar.height, 0)
+          .applyQuaternion(npcPlayer.avatar.quaternion)
+      ); */
+      npcPlayer.eyeballTarget.copy(localPlayer.position);
+      npcPlayer.eyeballTargetEnabled = true;
       npcPlayer.updateAvatar(timestamp, timeDiff);
     }
     /* if (avatar) {
