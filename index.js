@@ -25,7 +25,7 @@ export default e => {
   const scene = useScene();
   const NpcPlayer = useNpcPlayerInternal();
   const localPlayer = useLocalPlayer();
-  // const physics = usePhysics();
+  const physics = usePhysics();
 
   const subApps = [];
   // let physicsIds = [];
@@ -69,7 +69,7 @@ export default e => {
   };
 
   useFrame(({timestamp, timeDiff}) => {
-    if (npcPlayer) {
+    if (npcPlayer && physics.getPhysicsEnabled()) {
       const f = timestamp / 5000;
       const s = Math.sin(f);
       npcPlayer.matrix.compose(
