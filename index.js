@@ -46,6 +46,7 @@ export default e => {
     vrmApp.updateMatrixWorld();
     vrmApp.name = 'npc';
     vrmApp.setComponent('physics', true);
+    vrmApp.setComponent('activate', true);
     await vrmApp.addModule(m);
     scene.add(vrmApp);
     subApps.push(vrmApp);
