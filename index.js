@@ -80,6 +80,8 @@ export default e => {
       npcPlayer.updateMatrixWorld();
       npcPlayer.eyeballTarget.copy(localPlayer.position);
       npcPlayer.eyeballTargetEnabled = true;
+
+      npcPlayer.updatePhysics(timestamp, timeDiff);
       npcPlayer.updateAvatar(timestamp, timeDiff);
     }
   });
