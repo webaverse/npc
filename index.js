@@ -52,6 +52,10 @@ export default e => {
     subApps.push(vrmApp);
 
     const newNpcPlayer = new NpcPlayer();
+    newNpcPlayer.name = 'npc';
+    newNpcPlayer.position.copy(app.position)
+      .add(new THREE.Vector3(0, 1, 0));
+    newNpcPlayer.quaternion.copy(app.quaternion);
     await newNpcPlayer.setAvatarAppAsync(vrmApp);
     npcPlayer = newNpcPlayer;
   })());
