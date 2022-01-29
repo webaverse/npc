@@ -27,6 +27,7 @@ export default e => {
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
 
+  let live = true;
   const subApps = [];
   // let physicsIds = [];
   let npcPlayer = null;
@@ -34,8 +35,9 @@ export default e => {
     // const u2 = `${baseUrl}tsumugi-taka.vrm`;
     // const u2 = `${baseUrl}rabbit.vrm`;
     // const u2 = `/avatars/drake_hacker_v3_vian.vrm`;
-    const u2 = `/avatars/Scillia_Drophunter_V19.vrm`;
+    const u2 = `/avatars/scillia_drophunter_v25_gloria_vian.vrm`;
     const m = await metaversefile.import(u2);
+    if (!live) return;
     const vrmApp = metaversefile.createApp({
       name: u2,
     });
@@ -48,6 +50,7 @@ export default e => {
     vrmApp.setComponent('physics', true);
     vrmApp.setComponent('activate', true);
     await vrmApp.addModule(m);
+    if (!live) return;
     scene.add(vrmApp);
     subApps.push(vrmApp);
 
@@ -57,44 +60,63 @@ export default e => {
       .add(new THREE.Vector3(0, 1, 0));
     newNpcPlayer.quaternion.copy(app.quaternion);
     await newNpcPlayer.setAvatarAppAsync(vrmApp);
+    if (!live) return;
+    newNpcPlayer.position.y = newNpcPlayer.avatar.height;
+    newNpcPlayer.updateMatrixWorld();
     npcPlayer = newNpcPlayer;
   })());
 
   app.getPhysicsObjects = () => {
     const result = [];
-    for (const subApp of subApps) {
+    /* for (const subApp of subApps) {
       result.push(...subApp.getPhysicsObjects());
+    } */
+    if (npcPlayer) {
+      // console.log('npc character controller', npcPlayer.physicsObject);
+      result.push(npcPlayer.physicsObject);
     }
     return result;
   };
 
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer && physics.getPhysicsEnabled()) {
-      const f = timestamp / 5000;
+      /* const f = timestamp / 5000;
       const s = Math.sin(f);
+      // console.log('set pos', localVector.set(s * 2, npcPlayer.avatar.height, 0).toArray().join(','));
       npcPlayer.matrix.compose(
         localVector.set(s * 2, npcPlayer.avatar.height, 0),
         localQuaternion.setFromAxisAngle(localVector2.set(0, 1, 0), 0),
         localVector3.set(1, 1, 1),
       ).premultiply(app.matrixWorld).decompose(npcPlayer.position, npcPlayer.quaternion, localVector3);
-      npcPlayer.updateMatrixWorld();
+      npcPlayer.updateMatrixWorld(); */
+
+      npcPlayer.characterPhysics.applyWasd(new THREE.Vector3(-0.05, 0, 0));
+
       npcPlayer.eyeballTarget.copy(localPlayer.position);
       npcPlayer.eyeballTargetEnabled = true;
 
       npcPlayer.updatePhysics(timestamp, timeDiff);
       npcPlayer.updateAvatar(timestamp, timeDiff);
+
+      // window.npcPlayer = npcPlayer;
     }
   });
 
   useActivate(() => {
-    console.log('activate');
+    console.log('activate npc');
   });
 
-  /* useCleanup(() => {
-    for (const physicsId of physicsIds) {
-      physics.removeGeometry(physicsId);
+  useCleanup(() => {
+    live = false;
+
+    for (const subApp of subApps) {
+      scene.remove(subApp);
     }
-  }); */
+
+    if (npcPlayer) {
+      npcPlayer.destroy();
+    }
+  });
 
   return app;
 };
