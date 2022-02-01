@@ -35,7 +35,7 @@ export default e => {
     // const u2 = `${baseUrl}tsumugi-taka.vrm`;
     // const u2 = `${baseUrl}rabbit.vrm`;
     // const u2 = `/avatars/drake_hacker_v3_vian.vrm`;
-    const u2 = `/avatars/scillia_drophunter_v25_gloria_vian.vrm`;
+    const u2 = `/avatars/drake_hacker_v3_vian.vrm`;
     const m = await metaversefile.import(u2);
     if (!live) return;
     const vrmApp = metaversefile.createApp({
