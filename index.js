@@ -78,6 +78,20 @@ export default e => {
     return result;
   };
 
+  let target = null;
+  useActivate(() => {
+    // console.log('activate npc');
+    if (!target) {
+      target = localPlayer;
+    } else {
+      target = null;
+    }
+  });
+
+  const slowdownFactor = 0.4;
+  const walkSpeed = 0.075 * slowdownFactor;
+  const runSpeed = walkSpeed * 8;
+  const speedDistanceRate = 0.07;
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer && physics.getPhysicsEnabled()) {
       /* const f = timestamp / 5000;
@@ -90,20 +104,29 @@ export default e => {
       ).premultiply(app.matrixWorld).decompose(npcPlayer.position, npcPlayer.quaternion, localVector3);
       npcPlayer.updateMatrixWorld(); */
 
-      npcPlayer.characterPhysics.applyWasd(new THREE.Vector3(-0.05, 0, 0));
+      // window.npcPlayer = npcPlayer;
+
+      if (target) {
+        const v = new THREE.Vector3().setFromMatrixPosition(target.matrixWorld)
+          .sub(npcPlayer.position);
+        v.y = 0;
+        const distance = v.length();
+        const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
+        v.normalize()
+          .multiplyScalar(speed * timeDiff);
+        npcPlayer.characterPhysics.applyWasd(v);
+      } else {
+        const v = new THREE.Vector3(-1, 0, 0)
+          .multiplyScalar(walkSpeed * timeDiff);
+        npcPlayer.characterPhysics.applyWasd(v);
+      }
 
       npcPlayer.eyeballTarget.copy(localPlayer.position);
       npcPlayer.eyeballTargetEnabled = true;
 
       npcPlayer.updatePhysics(timestamp, timeDiff);
       npcPlayer.updateAvatar(timestamp, timeDiff);
-
-      // window.npcPlayer = npcPlayer;
     }
-  });
-
-  useActivate(() => {
-    console.log('activate npc');
   });
 
   useCleanup(() => {
