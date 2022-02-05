@@ -120,7 +120,6 @@ export default e => {
       localPlayerZ,
     );
     pathFinder.untilFound();
-    console.log(444)
     target = pathFinder.startVoxel;
   }
 
@@ -142,14 +141,13 @@ export default e => {
 
       // window.npcPlayer = npcPlayer;
 
-      if (target) {
+      if (target && localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3) {
         if (Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 3 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 3) {
           calcPath();
         }
 
         if (Math.abs(npcPlayer.position.x - target.position.x) < 0.5 && Math.abs(npcPlayer.position.z - target.position.z) < 0.5) {
           if (target._next) {
-            console.log(555);
             target = target._next;
           }
         }
