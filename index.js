@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useActivate, useLocalPlayer, useNpcPlayerInternal, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useActivate, useLocalPlayer, useNpcPlayerInternal, useLoaders, useScene, usePhysics, useCleanup, usePathFinder} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -26,6 +26,7 @@ export default e => {
   const NpcPlayer = useNpcPlayerInternal();
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
+  const pathFinder = usePathFinder();
 
   let live = true;
   const subApps = [];
@@ -82,11 +83,46 @@ export default e => {
   useActivate(() => {
     // console.log('activate npc');
     if (!target) {
-      target = localPlayer;
+      target = pathFinder.startVoxel;
     } else {
       target = null;
     }
   });
+
+  function calcPath() { // run after: rise(), generateVoxelMap(), and "E" activated the NPC.
+    const npcX = Math.round(npcPlayer.position.x);
+    const npcZ = Math.round(npcPlayer.position.z);
+    const localPlayerX = Math.round(localPlayer.position.x);
+    const localPlayerZ = Math.round(localPlayer.position.z);
+
+    let startLayer, destLayer;
+    const startVoxel = pathFinder.getVoxel(npcX, npcZ);
+    const startVoxel2 = pathFinder.getVoxel2(npcX, npcZ);
+    const destVoxel = pathFinder.getVoxel(localPlayerX, localPlayerZ);
+    const destVoxel2 = pathFinder.getVoxel2(localPlayerX, localPlayerZ);
+    if (Math.abs(startVoxel.position.y - npcPlayer.position.y) < Math.abs(startVoxel2.position.y - npcPlayer.position.y)) {
+      startLayer = 1;
+    } else {
+      startLayer = 2;
+    }
+    if (Math.abs(destVoxel.position.y - localPlayer.position.y) < Math.abs(destVoxel2.position.y - localPlayer.position.y)) {
+      destLayer = 1;
+    } else {
+      destLayer = 2;
+    }
+
+    pathFinder.resetStartDest(
+      startLayer,
+      npcX,
+      npcZ,
+      destLayer,
+      localPlayerX,
+      localPlayerZ,
+    );
+    pathFinder.untilFound();
+    console.log(444)
+    target = pathFinder.startVoxel;
+  }
 
   const slowdownFactor = 0.4;
   const walkSpeed = 0.075 * slowdownFactor;
@@ -107,18 +143,31 @@ export default e => {
       // window.npcPlayer = npcPlayer;
 
       if (target) {
+        if (Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 3 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 3) {
+          calcPath();
+        }
+
+        if (Math.abs(npcPlayer.position.x - target.position.x) < 0.5 && Math.abs(npcPlayer.position.z - target.position.z) < 0.5) {
+          if (target._next) {
+            console.log(555);
+            target = target._next;
+          }
+        }
+
+        console.log(target.position.x, target.position.z);
         const v = new THREE.Vector3().setFromMatrixPosition(target.matrixWorld)
           .sub(npcPlayer.position);
         v.y = 0;
         const distance = v.length();
-        const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
+        // const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
+        const speed = Math.min(Math.max(walkSpeed + ((distance) * speedDistanceRate), 0), runSpeed);
         v.normalize()
           .multiplyScalar(speed * timeDiff);
         npcPlayer.characterPhysics.applyWasd(v);
       } else {
-        const v = new THREE.Vector3(-1, 0, 0)
-          .multiplyScalar(walkSpeed * timeDiff);
-        npcPlayer.characterPhysics.applyWasd(v);
+        // const v = new THREE.Vector3(-1, 0, 0)
+        //   .multiplyScalar(walkSpeed * timeDiff);
+        // npcPlayer.characterPhysics.applyWasd(v);
       }
 
       npcPlayer.eyeballTarget.copy(localPlayer.position);
