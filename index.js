@@ -146,7 +146,7 @@ export default e => {
           calcPath();
         }
 
-        if (Math.abs(npcPlayer.position.x - target.position.x) < 0.5 && Math.abs(npcPlayer.position.z - target.position.z) < 0.5) {
+        if (Math.abs(npcPlayer.position.x - target.position.x) < 0.3 && Math.abs(npcPlayer.position.z - target.position.z) < 0.3) {
           if (target._next) {
             target = target._next;
           }
