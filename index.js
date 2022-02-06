@@ -65,6 +65,7 @@ export default e => {
     newNpcPlayer.position.y = newNpcPlayer.avatar.height;
     newNpcPlayer.updateMatrixWorld();
     npcPlayer = newNpcPlayer;
+    window.npcPlayer = npcPlayer;
   })());
 
   app.getPhysicsObjects = () => {
@@ -142,7 +143,7 @@ export default e => {
       // window.npcPlayer = npcPlayer;
 
       if (target && localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3) {
-        if (Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 3 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 3) {
+        if (Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 0.5 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 0.5) {
           calcPath();
         }
 
