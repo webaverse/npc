@@ -65,7 +65,6 @@ export default e => {
     newNpcPlayer.position.y = newNpcPlayer.avatar.height;
     newNpcPlayer.updateMatrixWorld();
     npcPlayer = newNpcPlayer;
-    window.npcPlayer = npcPlayer;
   })());
 
   app.getPhysicsObjects = () => {
@@ -153,7 +152,7 @@ export default e => {
           }
         }
 
-        console.log(target.position.x, target.position.z);
+        if (pathFinder.debugRender) console.log(target.position.x, target.position.z);
         const v = new THREE.Vector3().setFromMatrixPosition(target.matrixWorld)
           .sub(npcPlayer.position);
         v.y = 0;
@@ -164,9 +163,9 @@ export default e => {
           .multiplyScalar(speed * timeDiff);
         npcPlayer.characterPhysics.applyWasd(v);
       } else {
-        // const v = new THREE.Vector3(-1, 0, 0)
-        //   .multiplyScalar(walkSpeed * timeDiff);
-        // npcPlayer.characterPhysics.applyWasd(v);
+        const v = new THREE.Vector3(-1, 0, 0)
+          .multiplyScalar(walkSpeed * timeDiff);
+        npcPlayer.characterPhysics.applyWasd(v);
       }
 
       npcPlayer.eyeballTarget.copy(localPlayer.position);
