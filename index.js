@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useActivate, useLocalPlayer, useNpcPlayerInternal, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useActivate, useLocalPlayer, useChatManager, useLoreAI, useNpcPlayerInternal, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -10,15 +10,32 @@ const localVector3 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
 // const localMatrix = new THREE.Matrix4();
 
-/* const unFrustumCull = o => {
-  o.traverse(o => {
-    if (o.isMesh) {
-      o.frustumCulled = false;
-      // o.castShadow = true;
-      // o.receiveShadow = true;
-    }
-  });
-}; */
+const characterLore = `\
+# Setting
+
+AI anime avatars in a virtual world. They have human-level intelligence.
+`;
+const _makeChatPrompt = (srcCharacterName, dstCharacterName, srcBio, dstBio, messages) => `\
+${characterLore}
+
+# Characters
+
+${srcCharacterName}: ${srcBio}
+
+${dstCharacterName}:  ${dstBio}
+
+# Scene 1
+
+${
+  messages.map(m => {
+    return `${m.name}: ${m.message}\n`;
+  }).join('')
+}
+${((messages.length % 2) === 1) ?
+  `${dstCharacterName}:`
+:
+  `${srcCharacterName}:`
+}`;
 
 export default e => {
   const app = useApp();
@@ -26,6 +43,18 @@ export default e => {
   const NpcPlayer = useNpcPlayerInternal();
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
+  const chatManager = useChatManager();
+  const loreAI = useLoreAI();
+
+  const localPlayerName = `Scillia`;
+  const npcName = `Drake`;
+  const npcNameLowerCase = npcName.toLowerCase();
+  const localPlayerBio = `\
+Nickname Scilly or SLY. 13/F drop hunter. She is an adventurer, swordfighter and fan of potions. She is exceptionally skilled.
+`;
+  const npcBio = `\
+Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He has his own strong morals.
+`;
 
   let live = true;
   const subApps = [];
@@ -86,6 +115,42 @@ export default e => {
     } else {
       target = null;
     }
+  });
+
+  const messages = [];
+  let waiting = false;
+  chatManager.addEventListener('messageadd', async e => {
+    const {player, message} = e.data;
+    console.log('message add', player !== npcPlayer, !waiting)
+    if (player !== npcPlayer && !waiting) { // message from someone else, and we are ready for it
+      const messageText = message.message;
+      if (messages.length > 0 || messageText.toLowerCase().includes(npcNameLowerCase)) { // continuation or start of conversation
+        messages.push({
+          name: localPlayerName,
+          message: messageText,
+        });
+        const prompt = _makeChatPrompt(localPlayerName, npcName, localPlayerBio, npcBio, messages);
+        console.log('got prompt', [prompt]);
+
+        {
+          waiting = true;
+          let response = await loreAI.generate(prompt, {
+            end: '\n',
+          });
+          waiting = false;
+
+          response = response.trimLeft();
+          messages.push({
+            name: npcName,
+            message: response,
+          });
+        
+          console.log('got response', [response], {waiting});
+        }
+        // console.log('got third party message', message);
+      }
+    }
+    // console.log('message add', e);
   });
 
   const slowdownFactor = 0.4;
