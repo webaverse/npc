@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useActivate, useLocalPlayer, useChatManager, useLoreAI, useNpcPlayerInternal, useLoaders, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useActivate, useLocalPlayer, useChatManager, useLoreAI, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -40,7 +40,7 @@ ${((messages.length % 2) === 1) ?
 export default e => {
   const app = useApp();
   const scene = useScene();
-  const NpcPlayer = useNpcPlayerInternal();
+  const npcManager = useNpcManager();
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
   const chatManager = useChatManager();
@@ -80,18 +80,24 @@ Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He ha
     vrmApp.setComponent('activate', true);
     await vrmApp.addModule(m);
     if (!live) return;
-    scene.add(vrmApp);
     subApps.push(vrmApp);
 
-    const newNpcPlayer = new NpcPlayer();
-    newNpcPlayer.name = 'npc';
-    newNpcPlayer.position.copy(app.position)
+    const position = app.position.clone()
       .add(new THREE.Vector3(0, 1, 0));
-    newNpcPlayer.quaternion.copy(app.quaternion);
-    await newNpcPlayer.setAvatarAppAsync(vrmApp);
+    const {quaternion, scale} = app;
+    const newNpcPlayer = await npcManager.createNpc({
+      name: npcName,
+      avatarApp: vrmApp,
+      position,
+      quaternion,
+      scale,
+    });
     if (!live) return;
     newNpcPlayer.position.y = newNpcPlayer.avatar.height;
     newNpcPlayer.updateMatrixWorld();
+
+    scene.add(vrmApp);
+    
     npcPlayer = newNpcPlayer;
   })());
 
