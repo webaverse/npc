@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 const {useApp, useFrame, useActivate, useLocalPlayer, useChatManager, useLoreAI, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
 
-const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
+// const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
