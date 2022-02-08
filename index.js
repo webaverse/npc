@@ -28,8 +28,8 @@ ${dstCharacterName}:  ${dstBio}
 
 ${
   messages.map(m => {
-    return `${m.name}: ${m.message}\n`;
-  }).join('')
+    return `${m.name}: ${m.message}`;
+  }).join('\n')
 }
 ${((messages.length % 2) === 1) ?
   `${dstCharacterName}:`
