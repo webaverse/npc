@@ -55,6 +55,7 @@ Nickname Scilly or SLY. 13/F drop hunter. She is an adventurer, swordfighter and
   const npcBio = `\
 Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He has his own strong morals.
 `;
+  const npcVoice = `1PUUS71w2ik0uuycNB30nXFze8C7O8OzY`;
 
   let live = true;
   const subApps = [];
@@ -95,6 +96,7 @@ Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He ha
     if (!live) return;
     newNpcPlayer.position.y = newNpcPlayer.avatar.height;
     newNpcPlayer.updateMatrixWorld();
+    newNpcPlayer.setVoice(npcVoice);
 
     scene.add(vrmApp);
     
