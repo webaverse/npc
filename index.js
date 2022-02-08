@@ -127,7 +127,8 @@ Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He ha
   let waiting = false;
   chatManager.addEventListener('messageadd', async e => {
     const {player, message} = e.data;
-    console.log('message add', player !== npcPlayer, !waiting)
+    // console.log('message add', player !== npcPlayer, !waiting)
+    
     if (player !== npcPlayer && !waiting) { // message from someone else, and we are ready for it
       const messageText = message.message;
       if (messages.length > 0 || messageText.toLowerCase().includes(npcNameLowerCase)) { // continuation or start of conversation
