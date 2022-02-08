@@ -146,6 +146,7 @@ Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He ha
           waiting = false;
 
           response = response.trimLeft();
+          chatManager.addPlayerMessage(npcPlayer, response);
           messages.push({
             name: npcName,
             message: response,
