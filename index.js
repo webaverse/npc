@@ -83,7 +83,7 @@ export default e => {
   useActivate(() => {
     // console.log('activate npc');
     if (!target) {
-      target = localPlayer;
+      target = npcPlayer;
     } else {
       target = null;
     }
@@ -109,12 +109,13 @@ export default e => {
 
       if (target && localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3) {
         if (!pathFinder.destVoxel || Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 0.5 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 0.5) {
-          localVector.copy(npcPlayer.position);
+          localVector.copy(npcPlayer.position); // TODO: Don't need check `pathFinder.destVoxel`?
           // localVector.y -= 1.518240094787793 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code npcPlayer's pivot height.
           localVector2.copy(localPlayer.position);
           // localVector2.y -= 1.257643157399774 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code localPlayer's pivot height.
-          pathFinder.getPath(localVector, localVector2);
-          if (pathFinder.startVoxel) target = pathFinder.startVoxel;
+          const isFound = pathFinder.getPath(localVector, localVector2);
+          // if (pathFinder.startVoxel) target = pathFinder.startVoxel;
+          if (isFound) target = pathFinder.waypointResult[0];
         }
 
         if (Math.abs(npcPlayer.position.x - target.position.x) < 0.3 && Math.abs(npcPlayer.position.z - target.position.z) < 0.3) {
@@ -124,7 +125,8 @@ export default e => {
         }
 
         // if (pathFinder.debugRender) console.log(target.position.x, target.position.z);
-        const v = new THREE.Vector3().setFromMatrixPosition(target.matrixWorld)
+        // const v = new THREE.Vector3().setFromMatrixPosition(target.matrixWorld)
+        const v = new THREE.Vector3().copy(target.position)
           .sub(npcPlayer.position);
         v.y = 0;
         const distance = v.length();
