@@ -109,7 +109,11 @@ export default e => {
 
       if (target && localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3) {
         if (!pathFinder.destVoxel || Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 0.5 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 0.5) {
-          pathFinder.getPath(npcPlayer.position,localPlayer.position)
+          localVector.copy(npcPlayer.position);
+          // localVector.y -= 1.518240094787793 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code npcPlayer's pivot height.
+          localVector2.copy(localPlayer.position);
+          // localVector2.y -= 1.257643157399774 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code localPlayer's pivot height.
+          pathFinder.getPath(localVector, localVector2);
           target = pathFinder.startVoxel;
         }
 
@@ -119,7 +123,7 @@ export default e => {
           }
         }
 
-        if (pathFinder.debugRender) console.log(target.position.x, target.position.z);
+        // if (pathFinder.debugRender) console.log(target.position.x, target.position.z);
         const v = new THREE.Vector3().setFromMatrixPosition(target.matrixWorld)
           .sub(npcPlayer.position);
         v.y = 0;
