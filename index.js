@@ -79,49 +79,15 @@ export default e => {
     return result;
   };
 
-  let target = null;
+  let target = null; // Object3D
   useActivate(() => {
     // console.log('activate npc');
     if (!target) {
-      target = pathFinder.startVoxel;
+      target = localPlayer;
     } else {
       target = null;
     }
   });
-
-  function calcPath() { // run after: rise(), generateVoxelMap(), and "E" activated the NPC.
-    const npcX = Math.round(npcPlayer.position.x);
-    const npcZ = Math.round(npcPlayer.position.z);
-    const localPlayerX = Math.round(localPlayer.position.x);
-    const localPlayerZ = Math.round(localPlayer.position.z);
-
-    let startLayer, destLayer;
-    const startVoxel = pathFinder.getVoxel(npcX, npcZ);
-    const startVoxel2 = pathFinder.getVoxel2(npcX, npcZ);
-    const destVoxel = pathFinder.getVoxel(localPlayerX, localPlayerZ);
-    const destVoxel2 = pathFinder.getVoxel2(localPlayerX, localPlayerZ);
-    if (Math.abs(startVoxel.position.y - npcPlayer.position.y) < Math.abs(startVoxel2.position.y - npcPlayer.position.y)) {
-      startLayer = 1;
-    } else {
-      startLayer = 2;
-    }
-    if (Math.abs(destVoxel.position.y - localPlayer.position.y) < Math.abs(destVoxel2.position.y - localPlayer.position.y)) {
-      destLayer = 1;
-    } else {
-      destLayer = 2;
-    }
-
-    pathFinder.resetStartDest(
-      startLayer,
-      npcX,
-      npcZ,
-      destLayer,
-      localPlayerX,
-      localPlayerZ,
-    );
-    pathFinder.untilFound();
-    target = pathFinder.startVoxel;
-  }
 
   const slowdownFactor = 0.4;
   const walkSpeed = 0.075 * slowdownFactor;
@@ -139,11 +105,12 @@ export default e => {
       ).premultiply(app.matrixWorld).decompose(npcPlayer.position, npcPlayer.quaternion, localVector3);
       npcPlayer.updateMatrixWorld(); */
 
-      // window.npcPlayer = npcPlayer;
+      window.npcPlayer = npcPlayer; // test
 
       if (target && localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3) {
-        if (Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 0.5 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 0.5) {
-          calcPath();
+        if (!pathFinder.destVoxel || Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 0.5 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 0.5) {
+          pathFinder.getPath(npcPlayer.position,localPlayer.position)
+          target = pathFinder.startVoxel;
         }
 
         if (Math.abs(npcPlayer.position.x - target.position.x) < 0.3 && Math.abs(npcPlayer.position.z - target.position.z) < 0.3) {
@@ -163,9 +130,9 @@ export default e => {
           .multiplyScalar(speed * timeDiff);
         npcPlayer.characterPhysics.applyWasd(v);
       } else {
-        const v = new THREE.Vector3(-1, 0, 0)
-          .multiplyScalar(walkSpeed * timeDiff);
-        npcPlayer.characterPhysics.applyWasd(v);
+        // const v = new THREE.Vector3(-1, 0, 0)
+        //   .multiplyScalar(walkSpeed * timeDiff);
+        // npcPlayer.characterPhysics.applyWasd(v);
       }
 
       npcPlayer.eyeballTarget.copy(localPlayer.position);
