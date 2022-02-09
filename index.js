@@ -114,7 +114,7 @@ export default e => {
           localVector2.copy(localPlayer.position);
           // localVector2.y -= 1.257643157399774 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code localPlayer's pivot height.
           pathFinder.getPath(localVector, localVector2);
-          target = pathFinder.startVoxel;
+          if (pathFinder.startVoxel) target = pathFinder.startVoxel;
         }
 
         if (Math.abs(npcPlayer.position.x - target.position.x) < 0.3 && Math.abs(npcPlayer.position.z - target.position.z) < 0.3) {
