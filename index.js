@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 const {useApp, useFrame, useActivate, useLocalPlayer, useChatManager, useLoreAI, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
 
-// const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
+const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -43,16 +43,22 @@ export default e => {
   const chatManager = useChatManager();
   const loreAI = useLoreAI();
 
-  const localPlayerName = `Scillia`;
-  const npcName = `Drake`;
+  const npcName = app.getComponent('name') ?? 'Anon';
+  const npcVoice = app.getComponent('voice') ?? '1jLX0Py6j8uY93Fjf2l0HOZQYXiShfWUO'; // Sweetie Belle
+  const npcBio = app.getComponent('bio') ?? 'A generic avatar.';
+  const npcAvatarUrl = app.getComponent('avatarUrl') ?? `/avatars/drake_hacker_v3_vian.vrm`;
+
+  const localPlayerName = `Ann`;
+  // const npcName = `Scillia`;
   const npcNameLowerCase = npcName.toLowerCase();
   const localPlayerBio = `\
-Nickname Scilly or SLY. 13/F drop hunter. She is an adventurer, swordfighter and fan of potions. She is exceptionally skilled.
+Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's potions. She is shy and keeps to herself but she is a powerful witch.
 `;
-  const npcBio = `\
-Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He has his own strong morals.
-`;
-  const npcVoice = `1PUUS71w2ik0uuycNB30nXFze8C7O8OzY`;
+  /* const npcBio = `\
+`; */
+  // const npcVoice = `1PUUS71w2ik0uuycNB30nXFze8C7O8OzY`; // Shining Armor
+  // const npcVoice = `1a3CYt0-oTTSFjxtZvAVMpClTmQteYua5`; // Trixie
+  // const npcVoice = `1jLX0Py6j8uY93Fjf2l0HOZQYXiShfWUO`; // Sweetie Belle
 
   let live = true;
   const subApps = [];
@@ -62,7 +68,9 @@ Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He ha
     // const u2 = `${baseUrl}tsumugi-taka.vrm`;
     // const u2 = `${baseUrl}rabbit.vrm`;
     // const u2 = `/avatars/drake_hacker_v3_vian.vrm`;
-    const u2 = `/avatars/drake_hacker_v3_vian.vrm`;
+    // const u2 = `/avatars/ANIME_GIRL_VRM-3.vrm`;
+    // const u2 = `/avatars/scillia_drophunter_v15_vian.vrm`;
+    const u2 = npcAvatarUrl;
     const m = await metaversefile.import(u2);
     if (!live) return;
     const vrmApp = metaversefile.createApp({
@@ -136,7 +144,6 @@ Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He ha
           message: messageText,
         });
         const prompt = _makeChatPrompt(localPlayerName, npcName, localPlayerBio, npcBio, messages);
-        console.log('got prompt', [prompt]);
 
         {
           waiting = true;
@@ -149,13 +156,16 @@ Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He ha
           waiting = false;
 
           response = response.trimLeft();
-          chatManager.addPlayerMessage(npcPlayer, response);
-          messages.push({
-            name: npcName,
-            message: response,
-          });
-        
-          console.log('got response', [response], {waiting});
+
+          console.log('got response', [prompt], [response]);
+
+          if (response) {
+            chatManager.addPlayerMessage(npcPlayer, response);
+            messages.push({
+              name: npcName,
+              message: response,
+            });
+          }
         }
         // console.log('got third party message', message);
       }
