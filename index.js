@@ -13,17 +13,14 @@ const localQuaternion = new THREE.Quaternion();
 const characterLore = `\
 # Setting
 
-AI anime avatars in a virtual world. They have human-level intelligence.
+AI anime avatars in a virtual world. They have human-level intelligence, but they have interesting personalities and conversations. The script is throught provoking.
 `;
 const _makeChatPrompt = (srcCharacterName, dstCharacterName, srcBio, dstBio, messages) => `\
 ${characterLore}
-
 # Characters
 
 ${srcCharacterName}: ${srcBio}
-
 ${dstCharacterName}:  ${dstBio}
-
 # Scene 1
 
 ${
