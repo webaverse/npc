@@ -132,16 +132,16 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
 
   const messages = [];
   let waiting = false;
-  chatManager.addEventListener('messageadd', async e => {
-    const {player, message} = e.data;
+  localPlayer.characterHups.addEventListener('voicestart', async e => {
+    // console.log('got voice start', e);
+    const {message} = e.data;
     // console.log('message add', player !== npcPlayer, !waiting)
     
-    if (player !== npcPlayer && !waiting) { // message from someone else, and we are ready for it
-      const messageText = message.message;
-      if (messages.length > 0 || messageText.toLowerCase().includes(npcNameLowerCase)) { // continuation or start of conversation
+    if (!waiting) { // message from someone else, and we are ready for it
+      if (messages.length > 0 || message.toLowerCase().includes(npcNameLowerCase)) { // continuation or start of conversation
         messages.push({
           name: localPlayerName,
-          message: messageText,
+          message: message,
         });
         const prompt = _makeChatPrompt(localPlayerName, npcName, localPlayerBio, npcBio, messages);
 
