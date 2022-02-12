@@ -169,18 +169,6 @@ Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He ha
   const speedDistanceRate = 0.07;
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer && physics.getPhysicsEnabled()) {
-      /* const f = timestamp / 5000;
-      const s = Math.sin(f);
-      // console.log('set pos', localVector.set(s * 2, npcPlayer.avatar.height, 0).toArray().join(','));
-      npcPlayer.matrix.compose(
-        localVector.set(s * 2, npcPlayer.avatar.height, 0),
-        localQuaternion.setFromAxisAngle(localVector2.set(0, 1, 0), 0),
-        localVector3.set(1, 1, 1),
-      ).premultiply(app.matrixWorld).decompose(npcPlayer.position, npcPlayer.quaternion, localVector3);
-      npcPlayer.updateMatrixWorld(); */
-
-      // window.npcPlayer = npcPlayer;
-
       if (target) {
         const v = new THREE.Vector3().setFromMatrixPosition(target.matrixWorld)
           .sub(npcPlayer.position);
