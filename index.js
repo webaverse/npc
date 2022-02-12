@@ -143,6 +143,8 @@ Nickname DRK. 15/M hacker. He is slightly evil, and is not above cheating. He ha
           let response = await loreAI.generate(prompt, {
             end: '\n',
             maxTokens: 100,
+            temperature: 1,
+            top_p: 0,
           });
           waiting = false;
 
