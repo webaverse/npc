@@ -173,7 +173,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer && physics.getPhysicsEnabled()) {
       if (target) {
-        const v = new THREE.Vector3().setFromMatrixPosition(target.matrixWorld)
+        const v = localVector.setFromMatrixPosition(target.matrixWorld)
           .sub(npcPlayer.position);
         v.y = 0;
         const distance = v.length();
@@ -182,7 +182,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
           .multiplyScalar(speed * timeDiff);
         npcPlayer.characterPhysics.applyWasd(v);
       } else {
-        const v = new THREE.Vector3(-1, 0, 0)
+        const v = localVector.set(-1, 0, 0)
           .multiplyScalar(walkSpeed * timeDiff);
         npcPlayer.characterPhysics.applyWasd(v);
       }
