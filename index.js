@@ -107,7 +107,7 @@ export default e => {
 
       window.npcPlayer = npcPlayer; // test
 
-      if (target && localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3) {
+      if (target && npcFarawayLocalPlayer()) {
         const isInitial = !pathFinder.destVoxel
 
         if (isInitial || localPlayerFarawayPrevDest()) {
@@ -125,8 +125,7 @@ export default e => {
           }
         }
 
-        const npcPlayerCloseToTarget = Math.abs(npcPlayer.position.x - target.position.x) < .05 && Math.abs(npcPlayer.position.z - target.position.z) < .05;
-        if (npcPlayerCloseToTarget) {
+        if (npcReachedTarget()) {
           if (target._next) {
             target = target._next;
           }
@@ -175,6 +174,12 @@ export default e => {
   function npcReachedDest() {
     const destResult = pathFinder.waypointResult[pathFinder.waypointResult.length - 1];
     return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
+  }
+  function npcFarawayLocalPlayer() {
+    return localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3;
+  }
+  function npcReachedTarget() {
+    return Math.abs(npcPlayer.position.x - target.position.x) < .05 && Math.abs(npcPlayer.position.z - target.position.z) < .05;
   }
 
   return app;
