@@ -1,38 +1,14 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useActivate, useLocalPlayer, useChatManager, useLoreAI, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useActivate, useLocalPlayer, useWorld, useChatManager, useLoreAI, useLoreAIScene, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
 
-const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
+// const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
 const localVector = new THREE.Vector3();
-const localVector2 = new THREE.Vector3();
-const localVector3 = new THREE.Vector3();
-const localQuaternion = new THREE.Quaternion();
+// const localVector2 = new THREE.Vector3();
+// const localVector3 = new THREE.Vector3();
+// const localQuaternion = new THREE.Quaternion();
 // const localMatrix = new THREE.Matrix4();
-
-const characterLore = `\
-# Setting
-
-AI anime avatars in a virtual world. They have human-level intelligence, but they have interesting personalities and conversations. The script is throught provoking.
-`;
-const _makeChatPrompt = (srcCharacterName, dstCharacterName, srcBio, dstBio, messages) => `\
-${characterLore}
-# Characters
-
-${srcCharacterName}: ${srcBio}
-${dstCharacterName}:  ${dstBio}
-# Scene 1
-
-${
-  messages.map(m => {
-    return `${m.name}: ${m.message}`;
-  }).join('\n')
-}
-${((messages.length % 2) === 1) ?
-  `${dstCharacterName}:`
-:
-  `${srcCharacterName}:`
-}`;
 
 export default e => {
   const app = useApp();
@@ -41,7 +17,9 @@ export default e => {
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
   const chatManager = useChatManager();
+  const world = useWorld();
   const loreAI = useLoreAI();
+  const loreAIScene = useLoreAIScene();
 
   const npcName = app.getComponent('name') ?? 'Anon';
   const npcVoice = app.getComponent('voice') ?? '1jLX0Py6j8uY93Fjf2l0HOZQYXiShfWUO'; // Sweetie Belle
@@ -125,45 +103,16 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
     }
   });
 
-  const messages = [];
-
   /* console.log('got deets', {
     npcName,
     npcVoice,
     npcBio,
     npcAvatarUrl,
   }); */
-  
-  localPlayer.characterHups.addEventListener('hupadd', e => {
-    const {hup} = e.data;
-    hup.addEventListener('voicestart', async e => {
-      const {message} = e.data;
-      if (messages.length > 0 || message.toLowerCase().includes(npcNameLowerCase)) { // continuation or start of conversation
-        messages.push({
-          name: localPlayerName,
-          message: message,
-        });
 
-        const prompt = _makeChatPrompt(localPlayerName, npcName, localPlayerBio, npcBio, messages);
-        let response = await loreAI.generate(prompt, {
-          end: '\n',
-          maxTokens: 100,
-          temperature: 1,
-          top_p: 0,
-        });
-        response = response.trimLeft();
-
-        console.log('got response', [prompt], [response]);
-
-        if (response) {
-          chatManager.addPlayerMessage(npcPlayer, response);
-          messages.push({
-            name: npcName,
-            message: response,
-          });
-        }
-      }
-    });
+  const character = loreAIScene.addCharacter({
+    name: npcName,
+    bio: npcBio,
   });
 
   const slowdownFactor = 0.4;
@@ -205,6 +154,8 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
     if (npcPlayer) {
       npcPlayer.destroy();
     }
+
+    loreAiScene.removeCharacter(character);
   });
 
   return app;
