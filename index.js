@@ -109,11 +109,8 @@ export default e => {
 
       if (target && localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3) {
         const isInitial = !pathFinder.destVoxel
-        let localPlayerFarawayPrevDest;
-        if(!isInitial){
-          localPlayerFarawayPrevDest = Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 0.5 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 0.5;
-        }
-        if (isInitial || localPlayerFarawayPrevDest) {
+
+        if (isInitial || localPlayerFarawayPrevDest()) {
           localVector.copy(npcPlayer.position); // TODO: Don't need check `pathFinder.destVoxel`?
           // localVector.y -= 1.518240094787793 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code npcPlayer's pivot height.
           localVector2.copy(localPlayer.position);
@@ -121,6 +118,11 @@ export default e => {
           const isFound = pathFinder.getPath(localVector, localVector2);
           // if (pathFinder.startVoxel) target = pathFinder.startVoxel;
           if (isFound) target = pathFinder.waypointResult[0];
+          else if (npcReachedDest()) {
+            const allowNearest = true;
+            const isFound = pathFinder.getPath(localVector, localVector2, allowNearest);
+            if (isFound) target = pathFinder.waypointResult[0];
+          }
         }
 
         const npcPlayerCloseToTarget = Math.abs(npcPlayer.position.x - target.position.x) < .05 && Math.abs(npcPlayer.position.z - target.position.z) < .05;
@@ -166,6 +168,14 @@ export default e => {
       npcPlayer.destroy();
     }
   });
+
+  function localPlayerFarawayPrevDest() {
+    return Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 0.5 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 0.5;
+  }
+  function npcReachedDest() {
+    const destResult = pathFinder.waypointResult[pathFinder.waypointResult.length - 1];
+    return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
+  }
 
   return app;
 };
