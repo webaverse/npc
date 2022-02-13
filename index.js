@@ -181,11 +181,11 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
         v.normalize()
           .multiplyScalar(speed * timeDiff);
         npcPlayer.characterPhysics.applyWasd(v);
-      } else {
+      } /* else {
         const v = localVector.set(-1, 0, 0)
           .multiplyScalar(walkSpeed * timeDiff);
         npcPlayer.characterPhysics.applyWasd(v);
-      }
+      } */
 
       npcPlayer.eyeballTarget.copy(localPlayer.position);
       npcPlayer.eyeballTargetEnabled = true;
