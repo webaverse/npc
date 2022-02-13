@@ -132,45 +132,58 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
 
   const messages = [];
   let waiting = false;
-  localPlayer.characterHups.addEventListener('voicestart', async e => {
-    // console.log('got voice start', e);
-    const {message} = e.data;
-    // console.log('message add', player !== npcPlayer, !waiting)
-    
-    if (!waiting) { // message from someone else, and we are ready for it
-      if (messages.length > 0 || message.toLowerCase().includes(npcNameLowerCase)) { // continuation or start of conversation
-        messages.push({
-          name: localPlayerName,
-          message: message,
-        });
-        const prompt = _makeChatPrompt(localPlayerName, npcName, localPlayerBio, npcBio, messages);
 
-        {
-          waiting = true;
-          let response = await loreAI.generate(prompt, {
-            end: '\n',
-            maxTokens: 100,
-            temperature: 1,
-            top_p: 0,
+  /* console.log('got deets', {
+    npcName,
+    npcVoice,
+    npcBio,
+    npcAvatarUrl,
+  }); */
+  
+  localPlayer.characterHups.addEventListener('hupadd', e => {
+    console.log('got hup add', e);
+    const {hup} = e.data;
+    hup.addEventListener('voicestart', async e => {
+      // localPlayer.addEventListener('voicestart', async e => {
+      console.log('got voice start', e);
+      const {message} = e.data;
+      // console.log('message add', player !== npcPlayer, !waiting)
+      
+      if (!waiting) { // message from someone else, and we are ready for it
+        if (messages.length > 0 || message.toLowerCase().includes(npcNameLowerCase)) { // continuation or start of conversation
+          messages.push({
+            name: localPlayerName,
+            message: message,
           });
-          waiting = false;
+          const prompt = _makeChatPrompt(localPlayerName, npcName, localPlayerBio, npcBio, messages);
 
-          response = response.trimLeft();
-
-          console.log('got response', [prompt], [response]);
-
-          if (response) {
-            chatManager.addPlayerMessage(npcPlayer, response);
-            messages.push({
-              name: npcName,
-              message: response,
+          {
+            waiting = true;
+            let response = await loreAI.generate(prompt, {
+              end: '\n',
+              maxTokens: 100,
+              temperature: 1,
+              top_p: 0,
             });
+            waiting = false;
+
+            response = response.trimLeft();
+
+            console.log('got response', [prompt], [response]);
+
+            if (response) {
+              chatManager.addPlayerMessage(npcPlayer, response);
+              messages.push({
+                name: npcName,
+                message: response,
+              });
+            }
           }
+          // console.log('got third party message', message);
         }
-        // console.log('got third party message', message);
       }
-    }
-    // console.log('message add', e);
+      // console.log('message add', e);
+    });
   });
 
   const slowdownFactor = 0.4;
