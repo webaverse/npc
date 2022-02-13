@@ -26,7 +26,9 @@ export default e => {
   const NpcPlayer = useNpcPlayerInternal();
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
-  const pathFinder = usePathFinder();
+  const PathFinder = usePathFinder();
+  const pathFinder = new PathFinder({voxelHeight: 2, debugRender: true});
+  window.pathFinder = pathFinder; // test
 
   let live = true;
   const subApps = [];
