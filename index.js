@@ -111,21 +111,28 @@ export default e => {
         const isInitial = !pathFinder.destVoxel
 
         if (isInitial || localPlayerFarawayPrevDest()) {
-          localVector.copy(npcPlayer.position); // TODO: Don't need check `pathFinder.destVoxel`?
+          console.log('localPlayerFarawayPrevDest')
+
+          // localVector.copy(npcPlayer.position); // TODO: Don't need check `pathFinder.destVoxel`?
           // localVector.y -= 1.518240094787793 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code npcPlayer's pivot height.
-          localVector2.copy(localPlayer.position);
+          // localVector2.copy(localPlayer.position);
           // localVector2.y -= 1.257643157399774 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code localPlayer's pivot height.
-          const isFound = pathFinder.getPath(localVector, localVector2);
+          // const isFound = pathFinder.getPath(localVector, localVector2);
+
+          // Don't allowNearest here? High probably get inaccurate result when accurate result already exists?
+          const isFound = pathFinder.getPath(npcPlayer.position, localPlayer.position, false);
           // if (pathFinder.startVoxel) target = pathFinder.startVoxel;
           if (isFound) target = pathFinder.waypointResult[0];
-          else if (npcReachedDest()) {
-            const allowNearest = true;
-            const isFound = pathFinder.getPath(localVector, localVector2, allowNearest);
-            if (isFound) target = pathFinder.waypointResult[0];
-          }
+        }
+
+        if (npcReachedDest()) { // TODO: Should need more checks for stable. // npcFarawayLocalPlayer() already checked in outter.
+          console.log('npcReachedDest')
+          const isFound = pathFinder.getPath(npcPlayer.position, localPlayer.position, true); // allowNearest
+          if (isFound) target = pathFinder.waypointResult[0];
         }
 
         if (npcReachedTarget()) {
+          console.log('npcReachedTarget')
           if (target._next) {
             target = target._next;
           }
