@@ -121,7 +121,7 @@ export default e => {
           // localVector2.y -= 1.257643157399774 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code localPlayer's pivot height.
           // const isFound = pathFinder.getPath(localVector, localVector2);
 
-          // Don't allowNearest here? High probably get inaccurate result when accurate result already exists?
+          // Don't allowNearest here, otherwise will get inaccurate result when accurate result already exists.
           const isFound = pathFinder.getPath(npcPlayer.position, localPlayer.position, false);
           // if (pathFinder.startVoxel) target = pathFinder.startVoxel;
           if (isFound) target = pathFinder.waypointResult[0];
