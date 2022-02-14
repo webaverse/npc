@@ -129,7 +129,7 @@ export default e => {
           if (isFound) target = pathFinder.waypointResult[0];
         }
 
-        if (npcReachedDest()) { // TODO: Should need more checks for stable. // npcFarawayLocalPlayer() already checked in outter.
+        if (pathFinder.waypointResult.length > 0 && npcReachedDest()) {
           // console.log('npcReachedDest')
           const isFound = pathFinder.getPath(npcPlayer.position, localPlayer.position, true); // allowNearest
           if (isFound) target = pathFinder.waypointResult[0];
