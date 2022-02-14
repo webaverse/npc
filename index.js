@@ -17,7 +17,7 @@ export default e => {
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
   const chatManager = useChatManager();
-  const world = useWorld();
+  // const world = useWorld();
   const loreAI = useLoreAI();
   const loreAIScene = useLoreAIScene();
 
@@ -26,12 +26,12 @@ export default e => {
   const npcBio = app.getComponent('bio') ?? 'A generic avatar.';
   const npcAvatarUrl = app.getComponent('avatarUrl') ?? `/avatars/drake_hacker_v3_vian.vrm`;
 
-  const localPlayerName = `Ann`;
+  // const localPlayerName = `Ann`;
   // const npcName = `Scillia`;
-  const npcNameLowerCase = npcName.toLowerCase();
-  const localPlayerBio = `\
+  // const npcNameLowerCase = npcName.toLowerCase();
+  /* const localPlayerBio = `\
 Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's potions. She is shy and keeps to herself but she is a powerful witch.
-`;
+`; */
   /* const npcBio = `\
 `; */
   // const npcVoice = `1PUUS71w2ik0uuycNB30nXFze8C7O8OzY`; // Shining Armor
@@ -113,6 +113,12 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
   const character = loreAIScene.addCharacter({
     name: npcName,
     bio: npcBio,
+  });
+  // console.log('got character', character);
+  character.addEventListener('say', e => {
+    console.log('got character say', e);
+    const {message} = e.data;
+    chatManager.addPlayerMessage(npcPlayer, message);
   });
 
   const slowdownFactor = 0.4;
