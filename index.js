@@ -4,6 +4,8 @@ const {useApp, useFrame, useActivate, useLocalPlayer, useNpcPlayerInternal, useL
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
+const localVector2D = new THREE.Vector2();
+const localVector2D2 = new THREE.Vector2();
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
@@ -186,6 +188,13 @@ export default e => {
   }
   function npcFarawayLocalPlayer() {
     return localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3;
+
+    // // Use 2D to handle localPlayer flying situation. // No, can't use 2D, will stop when on different layers.
+    // localVector2D.x = localPlayer.position.x
+    // localVector2D.y = localPlayer.position.z
+    // localVector2D2.x = npcPlayer.position.x
+    // localVector2D2.y = npcPlayer.position.z
+    // return localVector2D.sub(localVector2D2).length() > 3;
   }
   function npcReachedTarget() {
     return Math.abs(npcPlayer.position.x - target.position.x) < .05 && Math.abs(npcPlayer.position.z - target.position.z) < .05;
