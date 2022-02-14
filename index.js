@@ -113,13 +113,7 @@ export default e => {
         const isInitial = !pathFinder.destVoxel
 
         if (isInitial || localPlayerFarawayPrevDest()) {
-          console.log('localPlayerFarawayPrevDest')
-
-          // localVector.copy(npcPlayer.position); // TODO: Don't need check `pathFinder.destVoxel`?
-          // localVector.y -= 1.518240094787793 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code npcPlayer's pivot height.
-          // localVector2.copy(localPlayer.position);
-          // localVector2.y -= 1.257643157399774 // NOTE: More accurate when not sub, but not perfect accurate. // TODO: Do not hard-code localPlayer's pivot height.
-          // const isFound = pathFinder.getPath(localVector, localVector2);
+          // console.log('localPlayerFarawayPrevDest')
 
           // Don't allowNearest here, otherwise will get inaccurate result when accurate result already exists.
           const isFound = pathFinder.getPath(npcPlayer.position, localPlayer.position, false);
@@ -128,13 +122,13 @@ export default e => {
         }
 
         if (npcReachedDest()) { // TODO: Should need more checks for stable. // npcFarawayLocalPlayer() already checked in outter.
-          console.log('npcReachedDest')
+          // console.log('npcReachedDest')
           const isFound = pathFinder.getPath(npcPlayer.position, localPlayer.position, true); // allowNearest
           if (isFound) target = pathFinder.waypointResult[0];
         }
 
         if (npcReachedTarget()) {
-          console.log('npcReachedTarget')
+          // console.log('npcReachedTarget')
           if (target._next) {
             target = target._next;
           }
