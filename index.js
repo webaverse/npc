@@ -27,7 +27,7 @@ export default e => {
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
   const PathFinder = usePathFinder();
-  const pathFinder = new PathFinder({voxelHeight: 1.5, debugRender: true});
+  const pathFinder = new PathFinder({voxelHeight: 1.5});
   window.pathFinder = pathFinder; // test
 
   let live = true;
