@@ -30,8 +30,18 @@ export default e => {
   const physics = usePhysics();
 
   const PathFinder = usePathFinder();
-  const pathFinder = new PathFinder({voxelHeight: 1.5});
-  window.pathFinder = pathFinder; // test
+  const pathFinder = new PathFinder({voxelHeight = 1.5, heightTolerance = 0.6, detectStep = 0.1, maxIterdetect = 1000, maxIterStep = 1000, maxVoxelCacheLen = 10000, ignorePhysicsIds = [], debugRender = false});
+  /* args:
+    voxelHeight: Voxel height ( Y axis ) for collide detection, usually equal to npc's physical capsule height. X/Z axes sizes are hard-coded 1 now.
+    heightTolerance: Used to check whether currentVoxel can go above to neighbor voxels.
+    detectStep: How height every detecting step moving.
+    maxIterdetect: How many steps can one voxel detecing iterate.
+    maxIterStep: How many A* path-finding step can one getPath() iterate. One A* step can create up to 4 voxels, 0 ~ 4.
+    maxVoxelCacheLen: How many detected voxels can be cached.
+    ignorePhysicsIds: physicsIds that voxel detect() ignored, usually npc CharacterController's capsule.
+    debugRender: Whether show voxel boxes for debugging.
+  */
+  // window.pathFinder = pathFinder; // test
   let waypointResult = null;
   let lastWaypointResult = null;
   let lastDest = null;
@@ -114,7 +124,7 @@ export default e => {
       ).premultiply(app.matrixWorld).decompose(npcPlayer.position, npcPlayer.quaternion, localVector3);
       npcPlayer.updateMatrixWorld(); */
 
-      window.npcPlayer = npcPlayer; // test
+      // window.npcPlayer = npcPlayer; // test
 
       if (target && npcFarawayLocalPlayer()) {
         if (localPlayerFarawayLastDest()) {
