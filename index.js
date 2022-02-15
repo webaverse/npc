@@ -26,9 +26,13 @@ export default e => {
   const NpcPlayer = useNpcPlayerInternal();
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
+
   const PathFinder = usePathFinder();
   const pathFinder = new PathFinder({voxelHeight: 1.5});
   window.pathFinder = pathFinder; // test
+  let waypointResult = null;
+  let lastWaypointResult = null;
+  let lastDest = null;
 
   let live = true;
   const subApps = [];
@@ -111,21 +115,20 @@ export default e => {
       window.npcPlayer = npcPlayer; // test
 
       if (target && npcFarawayLocalPlayer()) {
-        const isInitial = !pathFinder.destVoxel
-
-        if (isInitial || localPlayerFarawayPrevDest()) {
-          // console.log('localPlayerFarawayPrevDest')
+        if (localPlayerFarawayLastDest()) {
+          // console.log('localPlayerFarawayLastDest')
 
           // Don't allowNearest here, otherwise will get inaccurate result when accurate result already exists.
-          const isFound = pathFinder.getPath(npcPlayer.position, localPlayer.position, false);
-          // if (pathFinder.startVoxel) target = pathFinder.startVoxel;
-          if (isFound) target = pathFinder.waypointResult[0];
+          waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position, false);
+          setWaypointResult(waypointResult);
         }
 
-        if (pathFinder.waypointResult.length > 0 && npcReachedDest()) {
+        const isNpcReachedDest = npcReachedDest();
+        if (isNpcReachedDest) {
           // console.log('npcReachedDest')
-          const isFound = pathFinder.getPath(npcPlayer.position, localPlayer.position, true); // allowNearest
-          if (isFound) target = pathFinder.waypointResult[0];
+          waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position, true); // allowNearest
+          setWaypointResult(waypointResult);
+
         }
 
         if (npcReachedTarget()) {
@@ -142,9 +145,11 @@ export default e => {
         const distance = localVector.length();
         // const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
         const speed = Math.min(Math.max(walkSpeed + ((distance) * speedDistanceRate), 0), runSpeed);
-        localVector.normalize()
-          .multiplyScalar(speed * timeDiff);
-        npcPlayer.characterPhysics.applyWasd(localVector);
+        if (!isNpcReachedDest) { // Fix npc jetter after reached dest problem.
+          localVector.normalize()
+            .multiplyScalar(speed * timeDiff);
+          npcPlayer.characterPhysics.applyWasd(localVector);
+        }
       } else {
         // const localVector = new THREE.Vector3(-1, 0, 0)
         //   .multiplyScalar(walkSpeed * timeDiff);
@@ -171,11 +176,21 @@ export default e => {
     }
   });
 
-  function localPlayerFarawayPrevDest() {
-    return Math.abs(localPlayer.position.x - pathFinder.destVoxel.position.x) > 0.5 || Math.abs(localPlayer.position.z - pathFinder.destVoxel.position.z) > 0.5;
+  function setWaypointResult(waypointResult) {
+    if (waypointResult) {
+      target = waypointResult[0];
+      lastWaypointResult = waypointResult;
+      lastDest = lastWaypointResult[lastWaypointResult.length - 1];
+    }
+  }
+
+  function localPlayerFarawayLastDest() {
+    if (!lastDest) return true;
+    return Math.abs(localPlayer.position.x - lastDest.position.x) > 0.5 || Math.abs(localPlayer.position.z - lastDest.position.z) > 0.5;
   }
   function npcReachedDest() {
-    const destResult = pathFinder.waypointResult[pathFinder.waypointResult.length - 1];
+    if (!lastWaypointResult) return false;
+    const destResult = lastWaypointResult[lastWaypointResult.length - 1];
     return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
   }
   function npcFarawayLocalPlayer() {
