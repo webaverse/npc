@@ -67,6 +67,7 @@ export default e => {
     newNpcPlayer.position.y = newNpcPlayer.avatar.height;
     newNpcPlayer.updateMatrixWorld();
     npcPlayer = newNpcPlayer;
+    pathFinder.setIgnorePhysicsIds([npcPlayer.physicsObject.physicsId]);
   })());
 
   app.getPhysicsObjects = () => {
