@@ -143,20 +143,19 @@ export default e => {
         }
 
         // if (pathFinder.debugRender) console.log(target.position.x, target.position.z);
-        // const v = new THREE.Vector3().setFromMatrixPosition(target.matrixWorld)
-        const v = new THREE.Vector3().copy(target.position)
+        localVector.copy(target.position) // localVector is velocity here.
           .sub(npcPlayer.position);
-        v.y = 0;
-        const distance = v.length();
+        localVector.y = 0;
+        const distance = localVector.length();
         // const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
         const speed = Math.min(Math.max(walkSpeed + ((distance) * speedDistanceRate), 0), runSpeed);
-        v.normalize()
+        localVector.normalize()
           .multiplyScalar(speed * timeDiff);
-        npcPlayer.characterPhysics.applyWasd(v);
+        npcPlayer.characterPhysics.applyWasd(localVector);
       } else {
-        // const v = new THREE.Vector3(-1, 0, 0)
+        // const localVector = new THREE.Vector3(-1, 0, 0)
         //   .multiplyScalar(walkSpeed * timeDiff);
-        // npcPlayer.characterPhysics.applyWasd(v);
+        // npcPlayer.characterPhysics.applyWasd(localVector);
       }
 
       npcPlayer.eyeballTarget.copy(localPlayer.position);
