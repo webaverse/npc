@@ -196,7 +196,7 @@ export default e => {
 
   function localPlayerFarawayLastDest() {
     if (!lastDest) return true;
-    return Math.abs(localPlayer.position.x - lastDest.position.x) > 0.5 || Math.abs(localPlayer.position.z - lastDest.position.z) > 0.5;
+    return Math.abs(localPlayer.position.x - lastDest.position.x) > 3 || Math.abs(localPlayer.position.z - lastDest.position.z) > 3;
   }
   function npcReachedDest() {
     if (!lastWaypointResult) return false;
