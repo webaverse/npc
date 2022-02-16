@@ -41,7 +41,7 @@ export default e => {
     ignorePhysicsIds: physicsIds that voxel detect() ignored, usually npc CharacterController's capsule.
     debugRender: Whether show voxel boxes for debugging.
   */
-  // window.pathFinder = pathFinder; // test
+  window.pathFinder = pathFinder; // test
   let waypointResult = null;
   let lastWaypointResult = null;
   let lastDest = null;
@@ -124,7 +124,7 @@ export default e => {
       ).premultiply(app.matrixWorld).decompose(npcPlayer.position, npcPlayer.quaternion, localVector3);
       npcPlayer.updateMatrixWorld(); */
 
-      // window.npcPlayer = npcPlayer; // test
+      window.npcPlayer = npcPlayer; // test
 
       if (target && npcFarawayLocalPlayer()) {
         if (localPlayerFarawayLastDest()) {
