@@ -1,31 +1,42 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useActivate, useLocalPlayer, useNpcPlayerInternal, useLoaders, useScene, usePhysics, useCleanup, usePathFinder} = metaversefile;
+const {useApp, useFrame, useActivate, useLocalPlayer, useWorld, useChatManager, useLoreAI, useLoreAIScene, useNpcManager, useScene, usePhysics, useCleanup, usePathFinder} = metaversefile;
 
-const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
+// const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
 const localVector = new THREE.Vector3();
-const localVector2 = new THREE.Vector3();
-const localVector3 = new THREE.Vector3();
-const localQuaternion = new THREE.Quaternion();
+// const localVector2 = new THREE.Vector3();
+// const localVector3 = new THREE.Vector3();
+// const localQuaternion = new THREE.Quaternion();
 // const localMatrix = new THREE.Matrix4();
-
-/* const unFrustumCull = o => {
-  o.traverse(o => {
-    if (o.isMesh) {
-      o.frustumCulled = false;
-      // o.castShadow = true;
-      // o.receiveShadow = true;
-    }
-  });
-}; */
 
 export default e => {
   const app = useApp();
   const scene = useScene();
-  const NpcPlayer = useNpcPlayerInternal();
+  const npcManager = useNpcManager();
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
+  const chatManager = useChatManager();
+  // const world = useWorld();
+  const loreAI = useLoreAI();
+  const loreAIScene = useLoreAIScene();
+
+  const npcName = app.getComponent('name') ?? 'Anon';
+  const npcVoice = app.getComponent('voice') ?? '1jLX0Py6j8uY93Fjf2l0HOZQYXiShfWUO'; // Sweetie Belle
+  const npcBio = app.getComponent('bio') ?? 'A generic avatar.';
+  const npcAvatarUrl = app.getComponent('avatarUrl') ?? `/avatars/drake_hacker_v3_vian.vrm`;
+
+  // const localPlayerName = `Ann`;
+  // const npcName = `Scillia`;
+  // const npcNameLowerCase = npcName.toLowerCase();
+  /* const localPlayerBio = `\
+Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's potions. She is shy and keeps to herself but she is a powerful witch.
+`; */
+  /* const npcBio = `\
+`; */
+  // const npcVoice = `1PUUS71w2ik0uuycNB30nXFze8C7O8OzY`; // Shining Armor
+  // const npcVoice = `1a3CYt0-oTTSFjxtZvAVMpClTmQteYua5`; // Trixie
+  // const npcVoice = `1jLX0Py6j8uY93Fjf2l0HOZQYXiShfWUO`; // Sweetie Belle
 
   const PathFinder = usePathFinder();
   const pathFinder = new PathFinder({voxelHeight: 1.5, heightTolerance: 0.6, detectStep: 0.1, maxIterdetect: 1000, maxIterStep: 1000, maxVoxelCacheLen: 10000, ignorePhysicsIds: [], debugRender: false});
@@ -46,13 +57,14 @@ export default e => {
 
   let live = true;
   const subApps = [];
-  // let physicsIds = [];
   let npcPlayer = null;
   e.waitUntil((async () => {
     // const u2 = `${baseUrl}tsumugi-taka.vrm`;
     // const u2 = `${baseUrl}rabbit.vrm`;
     // const u2 = `/avatars/drake_hacker_v3_vian.vrm`;
-    const u2 = `/avatars/drake_hacker_v3_vian.vrm`;
+    // const u2 = `/avatars/ANIME_GIRL_VRM-3.vrm`;
+    // const u2 = `/avatars/scillia_drophunter_v15_vian.vrm`;
+    const u2 = npcAvatarUrl;
     const m = await metaversefile.import(u2);
     if (!live) return;
     const vrmApp = metaversefile.createApp({
@@ -68,29 +80,32 @@ export default e => {
     vrmApp.setComponent('activate', true);
     await vrmApp.addModule(m);
     if (!live) return;
-    scene.add(vrmApp);
     subApps.push(vrmApp);
 
-    const newNpcPlayer = new NpcPlayer();
-    newNpcPlayer.name = 'npc';
-    newNpcPlayer.position.copy(app.position)
+    const position = app.position.clone()
       .add(new THREE.Vector3(0, 1, 0));
-    newNpcPlayer.quaternion.copy(app.quaternion);
-    await newNpcPlayer.setAvatarAppAsync(vrmApp);
+    const {quaternion, scale} = app;
+    const newNpcPlayer = await npcManager.createNpc({
+      name: npcName,
+      avatarApp: vrmApp,
+      position,
+      quaternion,
+      scale,
+    });
     if (!live) return;
     newNpcPlayer.position.y = newNpcPlayer.avatar.height;
     newNpcPlayer.updateMatrixWorld();
+    newNpcPlayer.setVoice(npcVoice);
+
+    scene.add(vrmApp);
+    
     npcPlayer = newNpcPlayer;
     pathFinder.setIgnorePhysicsIds([npcPlayer.physicsObject.physicsId]);
   })());
 
   app.getPhysicsObjects = () => {
     const result = [];
-    /* for (const subApp of subApps) {
-      result.push(...subApp.getPhysicsObjects());
-    } */
     if (npcPlayer) {
-      // console.log('npc character controller', npcPlayer.physicsObject);
       result.push(npcPlayer.physicsObject);
     }
     return result;
@@ -106,24 +121,30 @@ export default e => {
     }
   });
 
+  /* console.log('got deets', {
+    npcName,
+    npcVoice,
+    npcBio,
+    npcAvatarUrl,
+  }); */
+
+  const character = loreAIScene.addCharacter({
+    name: npcName,
+    bio: npcBio,
+  });
+  // console.log('got character', character);
+  character.addEventListener('say', e => {
+    console.log('got character say', e);
+    const {message} = e.data;
+    chatManager.addPlayerMessage(npcPlayer, message);
+  });
+
   const slowdownFactor = 0.4;
   const walkSpeed = 0.075 * slowdownFactor;
   const runSpeed = walkSpeed * 8;
   const speedDistanceRate = 0.07;
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer && physics.getPhysicsEnabled()) {
-      /* const f = timestamp / 5000;
-      const s = Math.sin(f);
-      // console.log('set pos', localVector.set(s * 2, npcPlayer.avatar.height, 0).toArray().join(','));
-      npcPlayer.matrix.compose(
-        localVector.set(s * 2, npcPlayer.avatar.height, 0),
-        localQuaternion.setFromAxisAngle(localVector2.set(0, 1, 0), 0),
-        localVector3.set(1, 1, 1),
-      ).premultiply(app.matrixWorld).decompose(npcPlayer.position, npcPlayer.quaternion, localVector3);
-      npcPlayer.updateMatrixWorld(); */
-
-      // window.npcPlayer = npcPlayer; // test
-
       if (target && npcFarawayLocalPlayer()) {
         if (localPlayerFarawayLastDest()) {
           // console.log('localPlayerFarawayLastDest')
@@ -149,22 +170,22 @@ export default e => {
         }
 
         // if (pathFinder.debugRender) console.log(target.position.x, target.position.z);
-        localVector.copy(target.position) // localVector is velocity here.
+        const v = localVector.copy(target.position)
           .sub(npcPlayer.position);
-        localVector.y = 0;
-        const distance = localVector.length();
+        v.y = 0;
+        const distance = v.length();
         // const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
         const speed = Math.min(Math.max(walkSpeed + ((distance) * speedDistanceRate), 0), runSpeed);
         if (!isNpcReachedDest) { // Fix npc jetter after reached dest problem.
-          localVector.normalize()
+          v.normalize()
             .multiplyScalar(speed * timeDiff);
-          npcPlayer.characterPhysics.applyWasd(localVector);
+          npcPlayer.characterPhysics.applyWasd(v);
         }
-      } else {
-        // const localVector = new THREE.Vector3(-1, 0, 0)
-        //   .multiplyScalar(walkSpeed * timeDiff);
-        // npcPlayer.characterPhysics.applyWasd(localVector);
-      }
+      } /* else {
+        const v = localVector.set(-1, 0, 0)
+          .multiplyScalar(walkSpeed * timeDiff);
+        npcPlayer.characterPhysics.applyWasd(v);
+      } */
 
       npcPlayer.eyeballTarget.copy(localPlayer.position);
       npcPlayer.eyeballTargetEnabled = true;
@@ -184,6 +205,8 @@ export default e => {
     if (npcPlayer) {
       npcPlayer.destroy();
     }
+
+    loreAiScene.removeCharacter(character);
   });
 
   function setWaypointResult(waypointResult) {
