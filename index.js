@@ -93,13 +93,16 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
     return result;
   };
 
-  let target = null;
+  let targetSpec = null;
   useActivate(() => {
     // console.log('activate npc');
-    if (!target) {
-      target = localPlayer;
+    if (targetSpec?.object !== localPlayer) {
+      targetSpec = {
+        type: 'follow',
+        object: localPlayer,
+      };
     } else {
-      target = null;
+      targetSpec = null;
     }
   });
 
@@ -116,9 +119,36 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
   });
   // console.log('got character', character);
   character.addEventListener('say', e => {
-    console.log('got character say', e);
-    const {message} = e.data;
+    console.log('got character say', e.data);
+    const {message, emote, action, object, target} = e.data;
     chatManager.addPlayerMessage(npcPlayer, message);
+    if (emote === 'supersaiyan' || action === 'supersaiyan' || /supersaiyan/i.test(object) || /supersaiyan/i.test(target)) {
+      const newSssAction = {
+        type: 'sss',
+      };
+      npcPlayer.addAction(newSssAction);  
+    } else if (action === 'follow' || (object === 'none' && target === localPlayer.name)) { // follow player
+      targetSpec = {
+        type: 'follow',
+        object: localPlayer,
+      };
+    } else if (action === 'stop') { // stop
+      targetSpec = null;
+    } else if (action === 'moveto' || (object !== 'none' && target === 'none')) { // move to object
+      console.log('move to object', object);
+      /* target = localPlayer;
+      targetType = 'follow'; */
+    } else if (action === 'moveto' || (object === 'none' && target !== 'none')) { // move to player
+      // console.log('move to', object);
+      targetSpec = {
+        type: 'moveto',
+        object: localPlayer,
+      };
+    } else if (['pickup', 'grab', 'take', 'get'].includes(action)) { // pick up object
+      console.log('pickup', action, object, target);
+    } else if (['use', 'activate'].includes(action)) { // use object
+      console.log('use', action, object, target);
+    }
   });
 
   const slowdownFactor = 0.4;
@@ -127,20 +157,21 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
   const speedDistanceRate = 0.07;
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer && physics.getPhysicsEnabled()) {
-      if (target) {
+      if (targetSpec) {
+        const target = targetSpec.object;
         const v = localVector.setFromMatrixPosition(target.matrixWorld)
           .sub(npcPlayer.position);
         v.y = 0;
         const distance = v.length();
-        const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
-        v.normalize()
-          .multiplyScalar(speed * timeDiff);
-        npcPlayer.characterPhysics.applyWasd(v);
-      } /* else {
-        const v = localVector.set(-1, 0, 0)
-          .multiplyScalar(walkSpeed * timeDiff);
-        npcPlayer.characterPhysics.applyWasd(v);
-      } */
+        if (targetSpec.type === 'moveto' && distance < 2) {
+          targetSpec = null;
+        } else {
+          const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
+          v.normalize()
+            .multiplyScalar(speed * timeDiff);
+          npcPlayer.characterPhysics.applyWasd(v);
+        }
+      }
 
       npcPlayer.eyeballTarget.copy(localPlayer.position);
       npcPlayer.eyeballTargetEnabled = true;
