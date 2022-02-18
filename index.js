@@ -179,15 +179,11 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
         if (localPlayerFarawayLastDest()) {
           // console.log('localPlayerFarawayLastDest')
           waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position);
-          setWaypointResult(waypointResult);
-        }
-
-        const isNpcReachedDest = npcReachedDest();
-        if (isNpcReachedDest) {
-          // console.log('npcReachedDest')
-          waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position);
-          setWaypointResult(waypointResult);
-
+          if (waypointResult) {
+            targetSpec.object = waypointResult[0];
+            lastWaypointResult = waypointResult;
+            lastDest = lastWaypointResult[lastWaypointResult.length - 1];
+          }
         }
 
         if (npcReachedTarget()) {
@@ -205,9 +201,9 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
         if (targetSpec.type === 'moveto' && distance < 2) {
           targetSpec = null;
         } else {
-          // const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
-          const speed = Math.min(Math.max(walkSpeed + ((distance) * speedDistanceRate), 0), runSpeed);
-          if (!isNpcReachedDest) { // Fix npc jetter after reached dest problem.
+          if (!npcReachedDest()) { // Fix npc jetter after reached dest problem.
+            // const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
+            const speed = Math.min(Math.max(walkSpeed + ((distance) * speedDistanceRate), 0), runSpeed);
             v.normalize()
               .multiplyScalar(speed * timeDiff);
             npcPlayer.characterPhysics.applyWasd(v);
@@ -236,14 +232,6 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
 
     loreAiScene.removeCharacter(character);
   });
-
-  function setWaypointResult(waypointResult) {
-    if (waypointResult) {
-      targetSpec.object = waypointResult[0];
-      lastWaypointResult = waypointResult;
-      lastDest = lastWaypointResult[lastWaypointResult.length - 1];
-    }
-  }
 
   function localPlayerFarawayLastDest() {
     if (!lastDest) return true;
