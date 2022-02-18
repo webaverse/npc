@@ -148,16 +148,14 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
       if (target && npcFarawayLocalPlayer()) {
         if (localPlayerFarawayLastDest()) {
           // console.log('localPlayerFarawayLastDest')
-
-          // Don't allowNearest here, otherwise will get inaccurate result when accurate result already exists.
-          waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position, false);
+          waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position);
           setWaypointResult(waypointResult);
         }
 
         const isNpcReachedDest = npcReachedDest();
         if (isNpcReachedDest) {
           // console.log('npcReachedDest')
-          waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position, true); // allowNearest
+          waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position);
           setWaypointResult(waypointResult);
 
         }
