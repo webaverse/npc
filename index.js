@@ -50,7 +50,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
     ignorePhysicsIds: physicsIds that voxel detect() ignored, usually npc CharacterController's capsule.
     debugRender: Whether show voxel boxes for debugging.
   */
-  // window.pathFinder = pathFinder; // test
+  window.pathFinder = pathFinder; // test
   let waypointResult = null;
   let lastWaypointResult = null;
   let lastDest = null;
@@ -100,6 +100,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
     scene.add(vrmApp);
     
     npcPlayer = newNpcPlayer;
+    window.npcPlayer = npcPlayer;
     pathFinder.setIgnorePhysicsIds([npcPlayer.physicsObject.physicsId]);
   })());
 
