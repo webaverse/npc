@@ -114,7 +114,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
   let targetSpec = null;
   useActivate(() => {
     // console.log('activate npc');
-    if (targetSpec?.object !== npcPlayer) {
+    if (!targetSpec) {
       targetSpec = {
         type: 'follow',
         object: npcPlayer, // Object3D
@@ -148,7 +148,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
     } else if (action === 'follow' || (object === 'none' && target === localPlayer.name)) { // follow player
       targetSpec = {
         type: 'follow',
-        object: localPlayer,
+        object: npcPlayer,
       };
     } else if (action === 'stop') { // stop
       targetSpec = null;
@@ -160,7 +160,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
       // console.log('move to', object);
       targetSpec = {
         type: 'moveto',
-        object: localPlayer,
+        object: npcPlayer,
       };
     } else if (['pickup', 'grab', 'take', 'get'].includes(action)) { // pick up object
       console.log('pickup', action, object, target);
