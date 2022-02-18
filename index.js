@@ -111,13 +111,16 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
     return result;
   };
 
-  let target = null; // Object3D
+  let targetSpec = null;
   useActivate(() => {
     // console.log('activate npc');
-    if (!target) {
-      target = npcPlayer;
+    if (targetSpec?.object !== npcPlayer) {
+      targetSpec = {
+        type: 'follow',
+        object: npcPlayer, // Object3D
+      };
     } else {
-      target = null;
+      targetSpec = null;
     }
   });
 
@@ -134,9 +137,36 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
   });
   // console.log('got character', character);
   character.addEventListener('say', e => {
-    console.log('got character say', e);
-    const {message} = e.data;
+    console.log('got character say', e.data);
+    const {message, emote, action, object, target} = e.data;
     chatManager.addPlayerMessage(npcPlayer, message);
+    if (emote === 'supersaiyan' || action === 'supersaiyan' || /supersaiyan/i.test(object) || /supersaiyan/i.test(target)) {
+      const newSssAction = {
+        type: 'sss',
+      };
+      npcPlayer.addAction(newSssAction);  
+    } else if (action === 'follow' || (object === 'none' && target === localPlayer.name)) { // follow player
+      targetSpec = {
+        type: 'follow',
+        object: localPlayer,
+      };
+    } else if (action === 'stop') { // stop
+      targetSpec = null;
+    } else if (action === 'moveto' || (object !== 'none' && target === 'none')) { // move to object
+      console.log('move to object', object);
+      /* target = localPlayer;
+      targetType = 'follow'; */
+    } else if (action === 'moveto' || (object === 'none' && target !== 'none')) { // move to player
+      // console.log('move to', object);
+      targetSpec = {
+        type: 'moveto',
+        object: localPlayer,
+      };
+    } else if (['pickup', 'grab', 'take', 'get'].includes(action)) { // pick up object
+      console.log('pickup', action, object, target);
+    } else if (['use', 'activate'].includes(action)) { // use object
+      console.log('use', action, object, target);
+    }
   });
 
   const slowdownFactor = 0.4;
@@ -145,7 +175,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
   const speedDistanceRate = 0.07;
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer && physics.getPhysicsEnabled()) {
-      if (target && npcFarawayLocalPlayer()) {
+      if (targetSpec && npcFarawayLocalPlayer()) {
         if (localPlayerFarawayLastDest()) {
           // console.log('localPlayerFarawayLastDest')
           waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position);
@@ -162,28 +192,28 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
 
         if (npcReachedTarget()) {
           // console.log('npcReachedTarget')
-          if (target._next) {
-            target = target._next;
+          if (targetSpec.object._next) {
+            targetSpec.object = targetSpec.object._next;
           }
         }
 
-        // if (pathFinder.debugRender) console.log(target.position.x, target.position.z);
-        const v = localVector.copy(target.position)
+        // if (pathFinder.debugRender) console.log(targetSpec.object.position.x, targetSpec.object.position.z);
+        const v = localVector.copy(targetSpec.object.position)
           .sub(npcPlayer.position);
         v.y = 0;
         const distance = v.length();
-        // const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
-        const speed = Math.min(Math.max(walkSpeed + ((distance) * speedDistanceRate), 0), runSpeed);
-        if (!isNpcReachedDest) { // Fix npc jetter after reached dest problem.
-          v.normalize()
-            .multiplyScalar(speed * timeDiff);
-          npcPlayer.characterPhysics.applyWasd(v);
+        if (targetSpec.type === 'moveto' && distance < 2) {
+          targetSpec = null;
+        } else {
+          // const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
+          const speed = Math.min(Math.max(walkSpeed + ((distance) * speedDistanceRate), 0), runSpeed);
+          if (!isNpcReachedDest) { // Fix npc jetter after reached dest problem.
+            v.normalize()
+              .multiplyScalar(speed * timeDiff);
+            npcPlayer.characterPhysics.applyWasd(v);
+          }
         }
-      } /* else {
-        const v = localVector.set(-1, 0, 0)
-          .multiplyScalar(walkSpeed * timeDiff);
-        npcPlayer.characterPhysics.applyWasd(v);
-      } */
+      }
 
       npcPlayer.eyeballTarget.copy(localPlayer.position);
       npcPlayer.eyeballTargetEnabled = true;
@@ -209,7 +239,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
 
   function setWaypointResult(waypointResult) {
     if (waypointResult) {
-      target = waypointResult[0];
+      targetSpec.object = waypointResult[0];
       lastWaypointResult = waypointResult;
       lastDest = lastWaypointResult[lastWaypointResult.length - 1];
     }
@@ -228,7 +258,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
     return localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3;
   }
   function npcReachedTarget() {
-    return Math.abs(npcPlayer.position.x - target.position.x) < .05 && Math.abs(npcPlayer.position.z - target.position.z) < .05;
+    return Math.abs(npcPlayer.position.x - targetSpec.object.position.x) < .05 && Math.abs(npcPlayer.position.z - targetSpec.object.position.z) < .05;
   }
 
   return app;
