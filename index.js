@@ -82,13 +82,7 @@ export default e => {
     npcPlayer = newNpcPlayer;
   })());
 
-  app.getPhysicsObjects = () => {
-    const result = [];
-    if (npcPlayer) {
-      result.push(npcPlayer.physicsObject);
-    }
-    return result;
-  };
+  app.getPhysicsObjects = () => npcPlayer ? [npcPlayer.characterController] : [];
 
   let targetSpec = null;
   useActivate(() => {
