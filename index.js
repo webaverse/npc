@@ -29,9 +29,6 @@ export default e => {
   // const localPlayerName = `Ann`;
   // const npcName = `Scillia`;
   // const npcNameLowerCase = npcName.toLowerCase();
-  /* const localPlayerBio = `\
-Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's potions. She is shy and keeps to herself but she is a powerful witch.
-`; */
   /* const npcBio = `\
 `; */
   // const npcVoice = `1PUUS71w2ik0uuycNB30nXFze8C7O8OzY`; // Shining Armor
