@@ -54,6 +54,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
   let waypointResult = null;
   let lastWaypointResult = null;
   let lastDest = null;
+  let lastGetPathTime = 0;
 
   let live = true;
   const subApps = [];
@@ -177,8 +178,9 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer && physics.getPhysicsEnabled()) {
       if (targetSpec && npcFarawayLocalPlayer()) {
-        if (localPlayerFarawayLastDest()) {
+        if (performance.now() - lastGetPathTime > 1000 && localPlayerFarawayLastDest()) {
           // console.log('localPlayerFarawayLastDest')
+          lastGetPathTime = performance.now(); // Limit the execution of `getPath()` at most once per second, to prevent `getPath()` from being executed every frame when localPlayer exceeds the detection range of `maxIterStep`, resulting in serious performance degradation.
           waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position);
           if (waypointResult) {
             targetSpec.object = waypointResult[0];
