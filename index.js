@@ -75,7 +75,7 @@ export default e => {
     if (!live) return;
     newNpcPlayer.position.y = newNpcPlayer.avatar.height;
     newNpcPlayer.updateMatrixWorld();
-    newNpcPlayer.setVoice(npcVoice);
+    newNpcPlayer.setVoiceEndpoint(npcVoice);
 
     scene.add(vrmApp);
     
