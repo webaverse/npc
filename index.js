@@ -98,7 +98,8 @@ export default e => {
     scene.add(vrmApp);
     
     npcPlayer = newNpcPlayer;
-    pathFinder.setIgnorePhysicsIds([npcPlayer.physicsObject.physicsId]);
+    window.npcPlayer = npcPlayer;
+    pathFinder.setIgnorePhysicsIds([npcPlayer.characterController.physicsId]);
   })());
 
   app.getPhysicsObjects = () => npcPlayer ? [npcPlayer.characterController] : [];
