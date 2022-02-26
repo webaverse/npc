@@ -29,9 +29,6 @@ export default e => {
   // const localPlayerName = `Ann`;
   // const npcName = `Scillia`;
   // const npcNameLowerCase = npcName.toLowerCase();
-  /* const localPlayerBio = `\
-Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's potions. She is shy and keeps to herself but she is a powerful witch.
-`; */
   /* const npcBio = `\
 `; */
   // const npcVoice = `1PUUS71w2ik0uuycNB30nXFze8C7O8OzY`; // Shining Armor
@@ -96,7 +93,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
     if (!live) return;
     newNpcPlayer.position.y = newNpcPlayer.avatar.height;
     newNpcPlayer.updateMatrixWorld();
-    newNpcPlayer.setVoice(npcVoice);
+    newNpcPlayer.setVoiceEndpoint(npcVoice);
 
     scene.add(vrmApp);
     
@@ -104,13 +101,7 @@ Nickname ANN. 13/F witch. Best friend of Scillia. She creates all of Scillia's p
     pathFinder.setIgnorePhysicsIds([npcPlayer.physicsObject.physicsId]);
   })());
 
-  app.getPhysicsObjects = () => {
-    const result = [];
-    if (npcPlayer) {
-      result.push(npcPlayer.physicsObject);
-    }
-    return result;
-  };
+  app.getPhysicsObjects = () => npcPlayer ? [npcPlayer.characterController] : [];
 
   let targetSpec = null;
   useActivate(() => {
