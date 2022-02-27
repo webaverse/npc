@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useActivate, useLocalPlayer, useWorld, useChatManager, useLoreAI, useLoreAIScene, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useActivate, useLocalPlayer, useVoices, useChatManager, useLoreAI, useLoreAIScene, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
 
 // const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -20,9 +20,10 @@ export default e => {
   // const world = useWorld();
   const loreAI = useLoreAI();
   const loreAIScene = useLoreAIScene();
+  const voices = useVoices();
 
   const npcName = app.getComponent('name') ?? 'Anon';
-  const npcVoice = app.getComponent('voice') ?? '1jLX0Py6j8uY93Fjf2l0HOZQYXiShfWUO'; // Sweetie Belle
+  const npcVoiceName = app.getComponent('voice') ?? 'Sweetie Belle';
   const npcBio = app.getComponent('bio') ?? 'A generic avatar.';
   const npcAvatarUrl = app.getComponent('avatarUrl') ?? `/avatars/drake_hacker_v3_vian.vrm`;
 
@@ -62,6 +63,7 @@ export default e => {
     if (!live) return;
     subApps.push(vrmApp);
 
+    // set transform
     const position = app.position.clone()
       .add(new THREE.Vector3(0, 1, 0));
     const {quaternion, scale} = app;
@@ -75,8 +77,15 @@ export default e => {
     if (!live) return;
     newNpcPlayer.position.y = newNpcPlayer.avatar.height;
     newNpcPlayer.updateMatrixWorld();
-    newNpcPlayer.setVoiceEndpoint(npcVoice);
 
+    // set voice
+    const voice = voices.voiceEndpoints.find(v => v.name === npcVoiceName);
+    if (voice) {
+      newNpcPlayer.setVoiceEndpoint(voice.drive_id);
+    } else {
+      console.warn('unknown voice name', voiceName, voices.voiceEndpoints);
+    }
+    
     scene.add(vrmApp);
     
     npcPlayer = newNpcPlayer;
