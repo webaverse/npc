@@ -83,7 +83,7 @@ export default e => {
     if (voice) {
       newNpcPlayer.setVoiceEndpoint(voice.drive_id);
     } else {
-      console.warn('unknown voice name', voiceName, voices.voiceEndpoints);
+      console.warn('unknown voice name', npcVoiceName, voices.voiceEndpoints);
     }
     
     scene.add(vrmApp);
