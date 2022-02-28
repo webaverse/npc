@@ -26,6 +26,10 @@ export default e => {
   const npcVoiceName = app.getComponent('voice') ?? 'Sweetie Belle';
   const npcBio = app.getComponent('bio') ?? 'A generic avatar.';
   const npcAvatarUrl = app.getComponent('avatarUrl') ?? `/avatars/drake_hacker_v3_vian.vrm`;
+  let npcWear = app.getComponent('wear') ?? [];
+  if (!Array.isArray(npcWear)) {
+    npcWear = [npcWear];
+  }
 
   // const localPlayerName = `Ann`;
   // const npcName = `Scillia`;
