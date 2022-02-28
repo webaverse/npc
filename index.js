@@ -67,7 +67,6 @@ export default e => {
     if (!live) return;
     subApps.push(vrmApp);
 
-    // set transform
     const position = app.position.clone()
       .add(new THREE.Vector3(0, 1, 0));
     const {quaternion, scale} = app;
@@ -79,16 +78,37 @@ export default e => {
       scale,
     });
     if (!live) return;
-    newNpcPlayer.position.y = newNpcPlayer.avatar.height;
-    newNpcPlayer.updateMatrixWorld();
 
-    // set voice
-    const voice = voices.voiceEndpoints.find(v => v.name === npcVoiceName);
-    if (voice) {
-      newNpcPlayer.setVoiceEndpoint(voice.drive_id);
-    } else {
-      console.warn('unknown voice name', npcVoiceName, voices.voiceEndpoints);
-    }
+    const _setTransform = () => {
+      newNpcPlayer.position.y = newNpcPlayer.avatar.height;
+      newNpcPlayer.updateMatrixWorld();
+    };
+    _setTransform();
+
+    const _updateWearables = async () => {
+      const wearablePromises = npcWear.map(wear => (async () => {
+        const {start_url} = wear;
+        const app = await metaversefile.createAppAsync({
+          start_url,
+        });
+        if (!live) return;
+
+        newNpcPlayer.wear(app);
+      })());
+      await wearablePromises;
+    };
+    await _updateWearables();
+    if (!live) return;
+
+    const _setVoice = () => {
+      const voice = voices.voiceEndpoints.find(v => v.name === npcVoiceName);
+      if (voice) {
+        newNpcPlayer.setVoiceEndpoint(voice.drive_id);
+      } else {
+        console.warn('unknown voice name', npcVoiceName, voices.voiceEndpoints);
+      }
+    };
+    _setVoice();
     
     scene.add(vrmApp);
     
