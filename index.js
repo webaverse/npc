@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useActivate, useLocalPlayer, useVoices, useChatManager, useLoreAI, useLoreAIScene, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useActivate, useLocalPlayer, useVoices, useChatManager, useLoreAI, useLoreAIScene, useAvatar, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
 
 // const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -17,10 +17,12 @@ export default e => {
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
   const chatManager = useChatManager();
-  // const world = useWorld();
-  const loreAI = useLoreAI();
   const loreAIScene = useLoreAIScene();
   const voices = useVoices();
+  const Avatar = useAvatar();
+  const animations = Avatar.getAnimations();
+  const hurtAnimation = animations.find(a => a.isHurt);
+  const hurtAnimationDuration = hurtAnimation.duration;
 
   const npcName = app.getComponent('name') ?? 'Anon';
   const npcVoiceName = app.getComponent('voice') ?? 'Sweetie Belle';
@@ -101,6 +103,22 @@ export default e => {
   })());
 
   app.getPhysicsObjects = () => npcPlayer ? [npcPlayer.characterController] : [];
+
+  app.addEventListener('hit', e => {
+    // console.log('npc got hit', e);
+
+    if (!npcPlayer.hasAction('hurt')) {
+      const newAction = {
+        type: 'hurt',
+        animation: 'pain_back',
+      };
+      npcPlayer.addAction(newAction);
+      
+      setTimeout(() => {
+        npcPlayer.removeAction('hurt');
+      }, hurtAnimationDuration * 1000);
+    }
+  });
 
   let targetSpec = null;
   useActivate(() => {
