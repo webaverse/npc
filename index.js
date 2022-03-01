@@ -217,7 +217,7 @@ export default e => {
       npcPlayer.destroy();
     }
 
-    loreAiScene.removeCharacter(character);
+    loreAIScene.removeCharacter(character);
   });
 
   return app;
