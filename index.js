@@ -31,28 +31,14 @@ export default e => {
     npcWear = [npcWear];
   }
 
-  // const localPlayerName = `Ann`;
-  // const npcName = `Scillia`;
-  // const npcNameLowerCase = npcName.toLowerCase();
-  /* const npcBio = `\
-`; */
-  // const npcVoice = `1PUUS71w2ik0uuycNB30nXFze8C7O8OzY`; // Shining Armor
-  // const npcVoice = `1a3CYt0-oTTSFjxtZvAVMpClTmQteYua5`; // Trixie
-  // const npcVoice = `1jLX0Py6j8uY93Fjf2l0HOZQYXiShfWUO`; // Sweetie Belle
-
   let live = true;
-  const subApps = [];
+  let vrmApp = null;
   let npcPlayer = null;
   e.waitUntil((async () => {
-    // const u2 = `${baseUrl}tsumugi-taka.vrm`;
-    // const u2 = `${baseUrl}rabbit.vrm`;
-    // const u2 = `/avatars/drake_hacker_v3_vian.vrm`;
-    // const u2 = `/avatars/ANIME_GIRL_VRM-3.vrm`;
-    // const u2 = `/avatars/scillia_drophunter_v15_vian.vrm`;
     const u2 = npcAvatarUrl;
     const m = await metaversefile.import(u2);
     if (!live) return;
-    const vrmApp = metaversefile.createApp({
+    vrmApp = metaversefile.createApp({
       name: u2,
     });
 
@@ -65,7 +51,6 @@ export default e => {
     vrmApp.setComponent('activate', true);
     await vrmApp.addModule(m);
     if (!live) return;
-    subApps.push(vrmApp);
 
     const position = app.position.clone()
       .add(new THREE.Vector3(0, 1, 0));
@@ -208,9 +193,7 @@ export default e => {
   useCleanup(() => {
     live = false;
 
-    for (const subApp of subApps) {
-      scene.remove(subApp);
-    }
+    scene.remove(vrmApp);
 
     if (npcPlayer) {
       npcPlayer.destroy();
