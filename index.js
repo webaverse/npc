@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useActivate, useLocalPlayer, useVoices, useChatManager, useLoreAI, useLoreAIScene, useAvatar, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
+const {useApp, useFrame, useActivate, useLocalPlayer, useVoices, useChatManager, useLoreAI, useLoreAIScene, useAvatarAnimations, useNpcManager, useScene, usePhysics, useCleanup} = metaversefile;
 
 // const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -19,8 +19,7 @@ export default e => {
   const chatManager = useChatManager();
   const loreAIScene = useLoreAIScene();
   const voices = useVoices();
-  const Avatar = useAvatar();
-  const animations = Avatar.getAnimations();
+  const animations = useAvatarAnimations();
   const hurtAnimation = animations.find(a => a.isHurt);
   const hurtAnimationDuration = hurtAnimation.duration;
 
