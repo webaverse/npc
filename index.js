@@ -45,7 +45,7 @@ export default e => {
     ignorePhysicsIds: physicsIds that voxel detect() ignored, usually npc CharacterController's capsule.
     debugRender: Whether show voxel boxes for debugging.
   */
-  // window.pathFinder = pathFinder; // test
+  window.pathFinder = pathFinder; // test
   let waypointResult = null;
   let lastWaypointResult = null;
   let lastDest = null;
