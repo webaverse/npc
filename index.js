@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
-const {useApp, useFrame, useActivate, useLocalPlayer, useWorld, useChatManager, useLoreAI, useLoreAIScene, useNpcManager, useScene, usePhysics, useCleanup, usePathFinder} = metaversefile;
+const {useApp, useFrame, useActivate, useLocalPlayer, useVoices, useChatManager, useLoreAI, useLoreAIScene, useAvatarAnimations, useNpcManager, useScene, usePhysics, useCleanup, usePathFinder} = metaversefile;
 
 // const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -17,23 +17,20 @@ export default e => {
   const localPlayer = useLocalPlayer();
   const physics = usePhysics();
   const chatManager = useChatManager();
-  // const world = useWorld();
-  const loreAI = useLoreAI();
   const loreAIScene = useLoreAIScene();
+  const voices = useVoices();
+  const animations = useAvatarAnimations();
+  const hurtAnimation = animations.find(a => a.isHurt);
+  const hurtAnimationDuration = hurtAnimation.duration;
 
   const npcName = app.getComponent('name') ?? 'Anon';
-  const npcVoice = app.getComponent('voice') ?? '1jLX0Py6j8uY93Fjf2l0HOZQYXiShfWUO'; // Sweetie Belle
+  const npcVoiceName = app.getComponent('voice') ?? 'Sweetie Belle';
   const npcBio = app.getComponent('bio') ?? 'A generic avatar.';
   const npcAvatarUrl = app.getComponent('avatarUrl') ?? `/avatars/drake_hacker_v3_vian.vrm`;
-
-  // const localPlayerName = `Ann`;
-  // const npcName = `Scillia`;
-  // const npcNameLowerCase = npcName.toLowerCase();
-  /* const npcBio = `\
-`; */
-  // const npcVoice = `1PUUS71w2ik0uuycNB30nXFze8C7O8OzY`; // Shining Armor
-  // const npcVoice = `1a3CYt0-oTTSFjxtZvAVMpClTmQteYua5`; // Trixie
-  // const npcVoice = `1jLX0Py6j8uY93Fjf2l0HOZQYXiShfWUO`; // Sweetie Belle
+  let npcWear = app.getComponent('wear') ?? [];
+  if (!Array.isArray(npcWear)) {
+    npcWear = [npcWear];
+  }
 
   const PathFinder = usePathFinder();
   const pathFinder = new PathFinder({voxelHeight: 1.5, heightTolerance: 0.6, detectStep: 0.1, maxIterdetect: 1000, maxIterStep: 1000, maxVoxelCacheLen: 10000, ignorePhysicsIds: [], debugRender: false});
@@ -54,18 +51,13 @@ export default e => {
   let lastGetPathTime = 0;
 
   let live = true;
-  const subApps = [];
+  let vrmApp = null;
   let npcPlayer = null;
   e.waitUntil((async () => {
-    // const u2 = `${baseUrl}tsumugi-taka.vrm`;
-    // const u2 = `${baseUrl}rabbit.vrm`;
-    // const u2 = `/avatars/drake_hacker_v3_vian.vrm`;
-    // const u2 = `/avatars/ANIME_GIRL_VRM-3.vrm`;
-    // const u2 = `/avatars/scillia_drophunter_v15_vian.vrm`;
     const u2 = npcAvatarUrl;
     const m = await metaversefile.import(u2);
     if (!live) return;
-    const vrmApp = metaversefile.createApp({
+    vrmApp = metaversefile.createApp({
       name: u2,
     });
 
@@ -78,7 +70,6 @@ export default e => {
     vrmApp.setComponent('activate', true);
     await vrmApp.addModule(m);
     if (!live) return;
-    subApps.push(vrmApp);
 
     const position = app.position.clone()
       .add(new THREE.Vector3(0, 1, 0));
@@ -91,10 +82,38 @@ export default e => {
       scale,
     });
     if (!live) return;
-    newNpcPlayer.position.y = newNpcPlayer.avatar.height;
-    newNpcPlayer.updateMatrixWorld();
-    newNpcPlayer.setVoiceEndpoint(npcVoice);
 
+    const _setTransform = () => {
+      newNpcPlayer.position.y = newNpcPlayer.avatar.height;
+      newNpcPlayer.updateMatrixWorld();
+    };
+    _setTransform();
+
+    const _updateWearables = async () => {
+      const wearablePromises = npcWear.map(wear => (async () => {
+        const {start_url} = wear;
+        const app = await metaversefile.createAppAsync({
+          start_url,
+        });
+        if (!live) return;
+
+        newNpcPlayer.wear(app);
+      })());
+      await wearablePromises;
+    };
+    await _updateWearables();
+    if (!live) return;
+
+    const _setVoice = () => {
+      const voice = voices.voiceEndpoints.find(v => v.name === npcVoiceName);
+      if (voice) {
+        newNpcPlayer.setVoiceEndpoint(voice.drive_id);
+      } else {
+        console.warn('unknown voice name', npcVoiceName, voices.voiceEndpoints);
+      }
+    };
+    _setVoice();
+    
     scene.add(vrmApp);
     
     npcPlayer = newNpcPlayer;
@@ -103,6 +122,22 @@ export default e => {
   })());
 
   app.getPhysicsObjects = () => npcPlayer ? [npcPlayer.characterController] : [];
+
+  app.addEventListener('hit', e => {
+    // console.log('npc got hit', e);
+
+    if (!npcPlayer.hasAction('hurt')) {
+      const newAction = {
+        type: 'hurt',
+        animation: 'pain_back',
+      };
+      npcPlayer.addAction(newAction);
+      
+      setTimeout(() => {
+        npcPlayer.removeAction('hurt');
+      }, hurtAnimationDuration * 1000);
+    }
+  });
 
   let targetSpec = null;
   useActivate(() => {
@@ -216,15 +251,13 @@ export default e => {
   useCleanup(() => {
     live = false;
 
-    for (const subApp of subApps) {
-      scene.remove(subApp);
-    }
+    scene.remove(vrmApp);
 
     if (npcPlayer) {
       npcPlayer.destroy();
     }
 
-    loreAiScene.removeCharacter(character);
+    loreAIScene.removeCharacter(character);
   });
 
   function localPlayerFarawayLastDest() {
