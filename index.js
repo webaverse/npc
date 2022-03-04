@@ -26,7 +26,8 @@ export default e => {
   const npcName = app.getComponent('name') ?? 'Anon';
   const npcVoiceName = app.getComponent('voice') ?? 'Sweetie Belle';
   const npcBio = app.getComponent('bio') ?? 'A generic avatar.';
-  const npcAvatarUrl = app.getComponent('avatarUrl') ?? `/avatars/drake_hacker_v3_vian.vrm`;
+  // const npcAvatarUrl = app.getComponent('avatarUrl') ?? `/avatars/drake_hacker_v3_vian.vrm`;
+  const npcAvatarUrl = app.getComponent('avatarUrl') ?? `/avatars/citrine.vrm`;
   let npcWear = app.getComponent('wear') ?? [];
   if (!Array.isArray(npcWear)) {
     npcWear = [npcWear];
