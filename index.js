@@ -233,7 +233,8 @@ export default e => {
         } else {
           if (!npcReachedDest()) { // Fix npc jetter after reached dest problem.
             // const speed = Math.min(Math.max(walkSpeed + ((distance - 1.5) * speedDistanceRate), 0), runSpeed);
-            const speed = Math.min(Math.max(walkSpeed + ((distance) * speedDistanceRate), 0), runSpeed);
+            // const speed = Math.min(Math.max(walkSpeed + ((distance) * speedDistanceRate), 0), runSpeed);
+            const speed = 0;
             v.normalize()
               .multiplyScalar(speed * timeDiff);
             npcPlayer.characterPhysics.applyWasd(v);
@@ -263,7 +264,7 @@ export default e => {
 
   function localPlayerFarawayLastDest() {
     if (!lastDest) return true;
-    return Math.abs(localPlayer.position.x - lastDest.position.x) > 3 || Math.abs(localPlayer.position.z - lastDest.position.z) > 3;
+    return Math.abs(localPlayer.position.x - lastDest.position.x) > 1 || Math.abs(localPlayer.position.y - lastDest.position.y) > 1 || Math.abs(localPlayer.position.z - lastDest.position.z) > 1;
   }
   function npcReachedDest() {
     if (!lastWaypointResult) return false;
