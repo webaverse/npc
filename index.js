@@ -268,16 +268,16 @@ export default e => {
     if (!lastDest) return true;
     return Math.abs(localPlayer.position.x - lastDest.position.x) > 3 || Math.abs(localPlayer.position.z - lastDest.position.z) > 3;
   }
-  function npcReachedDest() {
-    if (!lastWaypointResult) return false;
-    const destResult = lastWaypointResult[lastWaypointResult.length - 1];
-    return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.y - destResult.position.y) < voxelHeightHalf && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
-  }
   function npcFarawayLocalPlayer() {
     return localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3;
   }
   function npcReachedTarget() {
     return Math.abs(npcPlayer.position.x - targetSpec.object.position.x) < .1 && Math.abs(npcPlayer.position.y - targetSpec.object.position.y) < voxelHeightHalf && Math.abs(npcPlayer.position.z - targetSpec.object.position.z) < .1;
+  }
+  function npcReachedDest() {
+    if (!lastWaypointResult) return false;
+    const destResult = lastWaypointResult[lastWaypointResult.length - 1];
+    return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.y - destResult.position.y) < voxelHeightHalf && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
   }
 
   return app;
