@@ -33,8 +33,10 @@ export default e => {
     npcWear = [npcWear];
   }
 
+  const voxelHeight = 1.5;
+  const voxelHeightHalf = voxelHeight / 2;
   const PathFinder = usePathFinder();
-  const pathFinder = new PathFinder({voxelHeight: 1.5, heightTolerance: 0.6, detectStep: 0.1, maxIterdetect: 1000, maxIterStep: 1000, maxVoxelCacheLen: 10000, ignorePhysicsIds: [], debugRender: false});
+  const pathFinder = new PathFinder({voxelHeight: voxelHeight, heightTolerance: 0.6, detectStep: 0.1, maxIterdetect: 1000, maxIterStep: 1000, maxVoxelCacheLen: 10000, ignorePhysicsIds: [], debugRender: false});
   /* args:
     voxelHeight: Voxel height ( Y axis ) for collide detection, usually equal to npc's physical capsule height. X/Z axes sizes are hard-coded 1 now.
     heightTolerance: Used to check whether currentVoxel can go above to neighbor voxels.
@@ -205,6 +207,7 @@ export default e => {
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer && physics.getPhysicsEnabled()) {
       if (targetSpec && npcFarawayLocalPlayer()) {
+        // console.log('npcFarawayLocalPlayer')
         if (performance.now() - lastGetPathTime > 1000 && localPlayerFarawayLastDest()) {
           // console.log('localPlayerFarawayLastDest')
           lastGetPathTime = performance.now(); // Limit the execution of `getPath()` at most once per second, to prevent `getPath()` from being executed every frame when localPlayer exceeds the detection range of `maxIterStep`, resulting in serious performance degradation.
@@ -268,13 +271,13 @@ export default e => {
   function npcReachedDest() {
     if (!lastWaypointResult) return false;
     const destResult = lastWaypointResult[lastWaypointResult.length - 1];
-    return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
+    return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.y - destResult.position.y) < voxelHeightHalf && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
   }
   function npcFarawayLocalPlayer() {
     return localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3;
   }
   function npcReachedTarget() {
-    return Math.abs(npcPlayer.position.x - targetSpec.object.position.x) < .05 && Math.abs(npcPlayer.position.z - targetSpec.object.position.z) < .05;
+    return Math.abs(npcPlayer.position.x - targetSpec.object.position.x) < .1 && Math.abs(npcPlayer.position.y - targetSpec.object.position.y) < voxelHeightHalf && Math.abs(npcPlayer.position.z - targetSpec.object.position.z) < .1;
   }
 
   return app;
