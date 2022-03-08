@@ -3,6 +3,7 @@ import metaversefile from 'metaversefile';
 const {useApp, useFrame, useActivate, useLocalPlayer, useVoices, useChatManager, useLoreAI, useLoreAIScene, useAvatarAnimations, useNpcManager, useScene, usePhysics, useCleanup, usePathFinder} = metaversefile;
 
 // const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
+const npcPlayerHeight = 1.518240094787793; // todo: no hardcode.
 
 const localVector = new THREE.Vector3();
 // const localVector2 = new THREE.Vector3();
@@ -209,18 +210,19 @@ export default e => {
       if (targetSpec && npcFarawayLocalPlayer()) {
         // console.log('npcFarawayLocalPlayer')
         if (performance.now() - lastGetPathTime > 1000 && localPlayerFarawayLastDest()) {
-          // console.log('localPlayerFarawayLastDest')
+          console.log('localPlayerFarawayLastDest')
           lastGetPathTime = performance.now(); // Limit the execution of `getPath()` at most once per second, to prevent `getPath()` from being executed every frame when localPlayer exceeds the detection range of `maxIterStep`, resulting in serious performance degradation.
           waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position);
           if (waypointResult) {
             targetSpec.object = waypointResult[0];
             lastWaypointResult = waypointResult;
             lastDest = lastWaypointResult[lastWaypointResult.length - 1];
+            console.log(lastDest)
           }
         }
 
         if (npcReachedTarget()) {
-          // console.log('npcReachedTarget')
+          console.log('npcReachedTarget')
           if (targetSpec.object._next) {
             targetSpec.object = targetSpec.object._next;
           }
@@ -272,12 +274,12 @@ export default e => {
     return localVector.subVectors(localPlayer.position, npcPlayer.position).length() > 3;
   }
   function npcReachedTarget() {
-    return Math.abs(npcPlayer.position.x - targetSpec.object.position.x) < .1 && Math.abs(npcPlayer.position.y - targetSpec.object.position.y) < voxelHeightHalf && Math.abs(npcPlayer.position.z - targetSpec.object.position.z) < .1;
+    return Math.abs(npcPlayer.position.x - targetSpec.object.position.x) < .5 && Math.abs(npcPlayer.position.y - targetSpec.object.position.y) < npcPlayerHeight && Math.abs(npcPlayer.position.z - targetSpec.object.position.z) < .5;
   }
   function npcReachedDest() {
     if (!lastWaypointResult) return false;
     const destResult = lastWaypointResult[lastWaypointResult.length - 1];
-    return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.y - destResult.position.y) < voxelHeightHalf && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
+    return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.y - destResult.position.y) < npcPlayerHeight && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
   }
 
   return app;
