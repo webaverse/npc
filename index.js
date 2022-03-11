@@ -34,17 +34,15 @@ export default e => {
     npcWear = [npcWear];
   }
 
-  const voxelHeight = 1.5;
+  const voxelHeight = 1.65;
   const voxelHeightHalf = voxelHeight / 2;
   const PathFinder = usePathFinder();
-  const pathFinder = new PathFinder({voxelHeight: voxelHeight, heightTolerance: 0.6, detectStep: 0.1, maxIterdetect: 1000, maxIterStep: 1000, maxVoxelCacheLen: 10000, ignorePhysicsIds: [], debugRender: false});
+  const pathFinder = new PathFinder({voxelHeight: voxelHeight, heightTolerance: 0.5, maxIterdetect: 1000, maxIterStep: 1000, ignorePhysicsIds: [], debugRender: false});
   /* args:
     voxelHeight: Voxel height ( Y axis ) for collide detection, usually equal to npc's physical capsule height. X/Z axes sizes are hard-coded 1 now.
     heightTolerance: Used to check whether currentVoxel can go above to neighbor voxels.
-    detectStep: How height every detecting step moving.
-    maxIterdetect: How many steps can one voxel detecing iterate.
+    maxIterDetect: How many steps can one voxel detecing iterate. Currently only `destVoxel` need this arg.
     maxIterStep: How many A* path-finding step can one getPath() iterate. One A* step can create up to 4 voxels, 0 ~ 4.
-    maxVoxelCacheLen: How many detected voxels can be cached.
     ignorePhysicsIds: physicsIds that voxel detect() ignored, usually npc CharacterController's capsule.
     debugRender: Whether show voxel boxes for debugging.
   */
