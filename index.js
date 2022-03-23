@@ -66,11 +66,13 @@ export default e => {
     });
     if (!live) return;
 
-    const _setTransform = () => {
+    // console.log('got position', position.toArray(), quaternion.toArray(), scale.toArray());
+
+    /* const _setTransform = () => {
       newNpcPlayer.position.y = newNpcPlayer.avatar.height;
       newNpcPlayer.updateMatrixWorld();
     };
-    _setTransform();
+    _setTransform(); */
 
     const _updateWearables = async () => {
       const wearablePromises = npcWear.map(wear => (async () => {
