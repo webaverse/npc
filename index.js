@@ -168,7 +168,7 @@ export default e => {
   });
   // console.log('got character', character);
   character.addEventListener('say', e => {
-    console.log('got character say', e.data);
+    // console.log('got character say', e.data);
     const {message, emote, action, object, target} = e.data;
     chatManager.addPlayerMessage(npcPlayer, message);
     if (emote === 'supersaiyan' || action === 'supersaiyan' || /supersaiyan/i.test(object) || /supersaiyan/i.test(target)) {
@@ -184,7 +184,7 @@ export default e => {
     } else if (action === 'stop') { // stop
       targetSpec = null;
     } else if (action === 'moveto' || (object !== 'none' && target === 'none')) { // move to object
-      console.log('move to object', object);
+      // console.log('move to object', object);
       /* target = localPlayer;
       targetType = 'follow'; */
     } else if (action === 'moveto' || (object === 'none' && target !== 'none')) { // move to player
@@ -194,9 +194,9 @@ export default e => {
         object: npcPlayer,
       };
     } else if (['pickup', 'grab', 'take', 'get'].includes(action)) { // pick up object
-      console.log('pickup', action, object, target);
+      // console.log('pickup', action, object, target);
     } else if (['use', 'activate'].includes(action)) { // use object
-      console.log('use', action, object, target);
+      // console.log('use', action, object, target);
     }
   });
 
@@ -209,19 +209,21 @@ export default e => {
       if (targetSpec) {
         // console.log('npcFarawayLocalPlayer')
         if (performance.now() - lastGetPathTime > 500) {
-          console.log('localPlayerFarawayLastDest')
+          // console.log('localPlayerFarawayLastDest')
           lastGetPathTime = performance.now(); // Limit the execution of `getPath()` at most once per second, to prevent `getPath()` from being executed every frame when localPlayer exceeds the detection range of `maxIterStep`, resulting in serious performance degradation.
+          console.time('getPath')
           waypointResult = pathFinder.getPath(npcPlayer.position, getRandomAwayDest());
+          console.timeEnd('getPath')
           if (waypointResult) {
             targetSpec.object = waypointResult[0];
             lastWaypointResult = waypointResult;
             lastDest = lastWaypointResult[lastWaypointResult.length - 1];
-            console.log(lastDest)
+            // console.log(lastDest)
           }
         }
 
         if (npcReachedTarget()) {
-          console.log('npcReachedTarget')
+          // console.log('npcReachedTarget')
           if (targetSpec.object._next) {
             targetSpec.object = targetSpec.object._next;
           }
