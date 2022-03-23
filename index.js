@@ -39,23 +39,24 @@ export default e => {
     const u2 = npcAvatarUrl;
     const m = await metaversefile.import(u2);
     if (!live) return;
+    
     vrmApp = metaversefile.createApp({
       name: u2,
     });
 
-    vrmApp.position.copy(app.position);
-    vrmApp.quaternion.copy(app.quaternion);
-    vrmApp.scale.copy(app.scale);
-    vrmApp.updateMatrixWorld();
+    vrmApp.matrixWorld.copy(app.matrixWorld);
+    vrmApp.matrix.copy(app.matrixWorld)
+      .decompose(vrmApp.position, vrmApp.quaternion, vrmApp.scale);
     vrmApp.name = 'npc';
     vrmApp.setComponent('physics', true);
     vrmApp.setComponent('activate', true);
+
     await vrmApp.addModule(m);
     if (!live) return;
 
-    const position = app.position.clone()
+    const position = vrmApp.position.clone()
       .add(new THREE.Vector3(0, 1, 0));
-    const {quaternion, scale} = app;
+    const {quaternion, scale} = vrmApp;
     const newNpcPlayer = await npcManager.createNpc({
       name: npcName,
       avatarApp: vrmApp,
