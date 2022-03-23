@@ -205,12 +205,12 @@ export default e => {
   const speedDistanceRate = 0.07;
   useFrame(({timestamp, timeDiff}) => {
     if (npcPlayer && physics.getPhysicsEnabled()) {
-      if (targetSpec && npcFarawayLocalPlayer()) {
+      if (targetSpec) {
         // console.log('npcFarawayLocalPlayer')
-        if (performance.now() - lastGetPathTime > 1000 && localPlayerFarawayLastDest()) {
+        if (performance.now() - lastGetPathTime > 100) {
           console.log('localPlayerFarawayLastDest')
           lastGetPathTime = performance.now(); // Limit the execution of `getPath()` at most once per second, to prevent `getPath()` from being executed every frame when localPlayer exceeds the detection range of `maxIterStep`, resulting in serious performance degradation.
-          waypointResult = pathFinder.getPath(npcPlayer.position, localPlayer.position);
+          waypointResult = pathFinder.getPath(npcPlayer.position, getAroundDest());
           if (waypointResult) {
             targetSpec.object = waypointResult[0];
             lastWaypointResult = waypointResult;
@@ -278,6 +278,13 @@ export default e => {
     if (!lastWaypointResult) return false;
     const destResult = lastWaypointResult[lastWaypointResult.length - 1];
     return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.y - destResult.position.y) < npcPlayerHeight && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
+  }
+  function getAroundDest() {
+    const vec = new THREE.Vector3().subVectors(npcPlayer.position, localPlayer.position);
+    vec.normalize().multiplyScalar(10);
+    vec.applyEuler(new THREE.Euler(0, Math.PI / 4, 0));
+    vec.add(localPlayer.position);
+    return vec;
   }
 
   return app;
