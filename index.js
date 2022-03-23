@@ -38,7 +38,7 @@ export default e => {
   const voxelHeight = 1.65;
   const voxelHeightHalf = voxelHeight / 2;
   const PathFinder = usePathFinder();
-  const pathFinder = new PathFinder({voxelHeight: voxelHeight, heightTolerance: 0.5, maxIterdetect: 1000, maxIterStep: 1000, ignorePhysicsIds: [], debugRender: false});
+  const pathFinder = new PathFinder({voxelHeight: voxelHeight, heightTolerance: 0.5, maxIterdetect: 1000, maxIterStep: 30, ignorePhysicsIds: [], debugRender: false});
   /* args:
     voxelHeight: Voxel height ( Y axis ) for collide detection, usually equal to npc's physical capsule height. X/Z axes sizes are hard-coded 1 now.
     heightTolerance: Used to check whether currentVoxel can go above to neighbor voxels.
