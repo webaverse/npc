@@ -283,7 +283,7 @@ export default e => {
   function getRandomAwayDest() {
     localVector2.subVectors(npcPlayer.position, localPlayer.position);
     localVector2.normalize().multiplyScalar(Math.random() * 10 + 10);
-    localVector2.applyEuler(localEuler.set(0, (Math.random() - 0.5) * Math.PI / 2, 0));
+    localVector2.applyEuler(localEuler.set(0, (Math.random() - 0.5) * Math.PI, 0));
     localVector2.add(localPlayer.position);
     return localVector2;
   }
