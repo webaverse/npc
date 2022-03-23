@@ -6,10 +6,11 @@ const {useApp, useFrame, useActivate, useLocalPlayer, useVoices, useChatManager,
 const npcPlayerHeight = 1.518240094787793; // todo: no hardcode.
 
 const localVector = new THREE.Vector3();
-// const localVector2 = new THREE.Vector3();
+const localVector2 = new THREE.Vector3();
 // const localVector3 = new THREE.Vector3();
 // const localQuaternion = new THREE.Quaternion();
 // const localMatrix = new THREE.Matrix4();
+const aroundStepEuler = new THREE.Euler(0, Math.PI / 4, 0);
 
 export default e => {
   const app = useApp();
@@ -280,11 +281,11 @@ export default e => {
     return Math.abs(npcPlayer.position.x - destResult.position.x) < 0.5 && Math.abs(npcPlayer.position.y - destResult.position.y) < npcPlayerHeight && Math.abs(npcPlayer.position.z - destResult.position.z) < 0.5
   }
   function getAroundDest() {
-    const vec = new THREE.Vector3().subVectors(npcPlayer.position, localPlayer.position);
-    vec.normalize().multiplyScalar(10);
-    vec.applyEuler(new THREE.Euler(0, Math.PI / 4, 0));
-    vec.add(localPlayer.position);
-    return vec;
+    localVector2.subVectors(npcPlayer.position, localPlayer.position);
+    localVector2.normalize().multiplyScalar(10);
+    localVector2.applyEuler(aroundStepEuler);
+    localVector2.add(localPlayer.position);
+    return localVector2;
   }
 
   return app;
