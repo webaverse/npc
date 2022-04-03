@@ -30,36 +30,17 @@ export default e => {
     }
 
     let live = true;
-    let vrmApp = null;
     let npcPlayer = null;
     e.waitUntil((async () => {
       const u2 = npcAvatarUrl;
-      const m = await metaversefile.import(u2);
       if (!live) return;
       
-      vrmApp = metaversefile.createApp({
-        name: u2,
-      });
-
-      vrmApp.matrixWorld.copy(app.matrixWorld);
-      vrmApp.matrix.copy(app.matrixWorld)
-        .decompose(vrmApp.position, vrmApp.quaternion, vrmApp.scale);
-      vrmApp.name = 'npc';
-      vrmApp.setComponent('physics', true);
-      vrmApp.setComponent('activate', true);
-
-      await vrmApp.addModule(m);
-      if (!live) return;
-
-      const position = vrmApp.position.clone()
-        .add(new THREE.Vector3(0, 1, 0));
-      const {quaternion, scale} = vrmApp;
       const newNpcPlayer = await npcManager.createNpc({
         name: npcName,
-        avatarApp: vrmApp,
-        position,
-        quaternion,
-        scale,
+        url: u2,
+        position: app.position,
+        quaternion: app.quaternion,
+        scale: app.scale,
       });
       if (!live) return;
 
@@ -87,8 +68,6 @@ export default e => {
         }
       };
       _setVoice();
-      
-      scene.add(vrmApp);
       
       npcPlayer = newNpcPlayer;
       app.npcPlayer = npcPlayer;
@@ -201,7 +180,9 @@ export default e => {
     useCleanup(() => {
       live = false;
 
-      scene.remove(vrmApp);
+      npcPlayer.appManager.apps.forEach(app => {
+        scene.remove(app);
+      });
 
       if (npcPlayer) {
         npcPlayer.destroy();
